@@ -1,0 +1,328 @@
+{
+  "stats": [
+    {
+      "id": "stat-total",
+      "title": "Total Assets",
+      "value": "211",
+      "change": "12% from last month",
+      "isPositive": true,
+      "icon": "Package",
+      "color": "indigo"
+    },
+    {
+      "id": "stat-available",
+      "title": "Available",
+      "value": "120",
+      "change": "8% from last month",
+      "isPositive": true,
+      "icon": "CheckCircle2",
+      "color": "emerald"
+    },
+    {
+      "id": "stat-allocated",
+      "title": "Allocated",
+      "value": "75",
+      "change": "5% from last month",
+      "isPositive": true,
+      "icon": "UserCheck",
+      "color": "violet"
+    },
+    {
+      "id": "stat-maintenance",
+      "title": "Under Maintenance",
+      "value": "6",
+      "change": "14% from last month",
+      "isPositive": false,
+      "icon": "Wrench",
+      "color": "orange"
+    }
+  ],
+  "filters": {
+    "categories": ["Laptop", "Projector", "Furniture", "Camera", "Monitor", "Printer", "Audio"],
+    "statuses": ["Available", "Allocated", "Maintenance", "Reserved", "Lost", "Disposed"],
+    "departments": ["IT Department", "HR Department", "Meeting Room", "Marketing", "Admin Department"],
+    "locations": ["IT Floor - 2", "Meeting Room", "HR Office", "Conf. Room B2", "Studio Room", "Admin Office"]
+  },
+  "assets": [
+    {
+      "id": 1,
+      "tag": "AF-0001",
+      "image": "Laptop",
+      "name": "Dell XPS 13",
+      "serialNumber": "DELLXPS001",
+      "category": "Laptop",
+      "department": "IT Department",
+      "location": "IT Floor - 2",
+      "assignedTo": "Priya Shah",
+      "status": "Allocated"
+    },
+    {
+      "id": 2,
+      "tag": "AF-0002",
+      "image": "Laptop",
+      "name": "HP EliteBook 840",
+      "serialNumber": "HPELITE002",
+      "category": "Laptop",
+      "department": "IT Department",
+      "location": "IT Floor - 2",
+      "assignedTo": null,
+      "status": "Available"
+    },
+    {
+      "id": 3,
+      "tag": "AF-0003",
+      "image": "Projector",
+      "name": "Epson Projector",
+      "serialNumber": "EPSON003",
+      "category": "Projector",
+      "department": "Meeting Room",
+      "location": "Conf. Room B2",
+      "assignedTo": "Karan Mehta",
+      "status": "Reserved"
+    },
+    {
+      "id": 4,
+      "tag": "AF-0004",
+      "image": "Furniture",
+      "name": "Ergonomic Chair",
+      "serialNumber": "CHAIR004",
+      "category": "Furniture",
+      "department": "HR Department",
+      "location": "HR Office",
+      "assignedTo": null,
+      "status": "Available"
+    },
+    {
+      "id": 5,
+      "tag": "AF-0005",
+      "image": "Camera",
+      "name": "Canon EOS 200D",
+      "serialNumber": "CAM200D05",
+      "category": "Camera",
+      "department": "Marketing",
+      "location": "Studio Room",
+      "assignedTo": "Neha Kapoor",
+      "status": "Maintenance"
+    },
+    {
+      "id": 6,
+      "tag": "AF-0006",
+      "image": "Monitor",
+      "name": "LG 24\" Monitor",
+      "serialNumber": "LG24MN006",
+      "category": "Monitor",
+      "department": "IT Department",
+      "location": "IT Floor - 2",
+      "assignedTo": "Rahul Verma",
+      "status": "Allocated"
+    },
+    {
+      "id": 7,
+      "tag": "AF-0007",
+      "image": "Printer",
+      "name": "HP LaserJet Pro",
+      "serialNumber": "HPPRT007",
+      "category": "Printer",
+      "department": "Admin Department",
+      "location": "Admin Office",
+      "assignedTo": null,
+      "status": "Available"
+    },
+    {
+      "id": 8,
+      "tag": "AF-0008",
+      "image": "Audio",
+      "name": "Blue Yeti Mic",
+      "serialNumber": "BLUEMIC008",
+      "category": "Audio",
+      "department": "Marketing",
+      "location": "Studio Room",
+      "assignedTo": null,
+      "status": "Available"
+    },
+    {
+      "id": 9,
+      "tag": "AF-0009",
+      "image": "Laptop",
+      "name": "MacBook Pro 16\"",
+      "serialNumber": "APPMBP009",
+      "category": "Laptop",
+      "department": "IT Department",
+      "location": "IT Floor - 2",
+      "assignedTo": "Arjun Sharma",
+      "status": "Allocated"
+    },
+    {
+      "id": 10,
+      "tag": "AF-0010",
+      "image": "Camera",
+      "name": "Sony Alpha 7 IV",
+      "serialNumber": "SONYA7410",
+      "category": "Camera",
+      "department": "Marketing",
+      "location": "Studio Room",
+      "assignedTo": null,
+      "status": "Available"
+    },
+    {
+      "id": 11,
+      "tag": "AF-0011",
+      "image": "Furniture",
+      "name": "Standing Desk",
+      "serialNumber": "DESK0011",
+      "category": "Furniture",
+      "department": "HR Department",
+      "location": "HR Office",
+      "assignedTo": "Sneha Roy",
+      "status": "Allocated"
+    },
+    {
+      "id": 12,
+      "tag": "AF-0012",
+      "image": "Monitor",
+      "name": "Dell UltraSharp 27\"",
+      "serialNumber": "DELL27M12",
+      "category": "Monitor",
+      "department": "IT Department",
+      "location": "IT Floor - 2",
+      "assignedTo": "Vikram Seth",
+      "status": "Allocated"
+    },
+    {
+      "id": 13,
+      "tag": "AF-0013",
+      "image": "Projector",
+      "name": "BenQ MH535",
+      "serialNumber": "BENQ53513",
+      "category": "Projector",
+      "department": "Meeting Room",
+      "location": "Conf. Room B2",
+      "assignedTo": null,
+      "status": "Available"
+    },
+    {
+      "id": 14,
+      "tag": "AF-0014",
+      "image": "Printer",
+      "name": "Canon imageRUNNER",
+      "serialNumber": "CANIRN14",
+      "category": "Printer",
+      "department": "Admin Department",
+      "location": "Admin Office",
+      "assignedTo": null,
+      "status": "Maintenance"
+    },
+    {
+      "id": 15,
+      "tag": "AF-0015",
+      "image": "Audio",
+      "name": "Bose Noise Cancelling 700",
+      "serialNumber": "BOSE70015",
+      "category": "Audio",
+      "department": "Marketing",
+      "location": "Studio Room",
+      "assignedTo": "Neha Kapoor",
+      "status": "Allocated"
+    },
+    {
+      "id": 16,
+      "tag": "AF-0016",
+      "image": "Laptop",
+      "name": "Lenovo ThinkPad X1",
+      "serialNumber": "LNVTPX116",
+      "category": "Laptop",
+      "department": "Admin Department",
+      "location": "Admin Office",
+      "assignedTo": "Rajesh Gupta",
+      "status": "Allocated"
+    },
+    {
+      "id": 17,
+      "tag": "AF-0017",
+      "image": "Laptop",
+      "name": "Asus ROG Zephyrus",
+      "serialNumber": "ASUSROG17",
+      "category": "Laptop",
+      "department": "IT Department",
+      "location": "IT Floor - 2",
+      "assignedTo": null,
+      "status": "Lost"
+    },
+    {
+      "id": 18,
+      "tag": "AF-0018",
+      "image": "Furniture",
+      "name": "Whiteboard 4x6",
+      "serialNumber": "WBD4618",
+      "category": "Furniture",
+      "department": "Meeting Room",
+      "location": "Conf. Room B2",
+      "assignedTo": null,
+      "status": "Disposed"
+    },
+    {
+      "id": 19,
+      "tag": "AF-0019",
+      "image": "Monitor",
+      "name": "Samsung Odyssey G9",
+      "serialNumber": "SAMSG919",
+      "category": "Monitor",
+      "department": "IT Department",
+      "location": "IT Floor - 2",
+      "assignedTo": "Arjun Sharma",
+      "status": "Allocated"
+    },
+    {
+      "id": 20,
+      "tag": "AF-0020",
+      "image": "Projector",
+      "name": "Sony VPL-VW295ES",
+      "serialNumber": "SONYW29520",
+      "category": "Projector",
+      "department": "Meeting Room",
+      "location": "Conf. Room B2",
+      "assignedTo": null,
+      "status": "Available"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Laptop",
+      "subCategories": ["Ultrabook", "Business", "Gaming"]
+    },
+    {
+      "id": 2,
+      "name": "Projector",
+      "subCategories": ["Laser", "Short Throw", "4K UHD"]
+    },
+    {
+      "id": 3,
+      "name": "Furniture",
+      "subCategories": ["Chair", "Desk", "Table"]
+    },
+    {
+      "id": 4,
+      "name": "Camera",
+      "subCategories": ["DSLR", "Mirrorless", "Action"]
+    },
+    {
+      "id": 5,
+      "name": "Monitor",
+      "subCategories": ["Ultrawide", "Gaming", "Curved"]
+    },
+    {
+      "id": 6,
+      "name": "Printer",
+      "subCategories": ["Inkjet", "Laser", "Dot Matrix"]
+    },
+    {
+      "id": 7,
+      "name": "Audio",
+      "subCategories": ["Headphones", "Microphone", "Speakers"]
+    }
+  ],
+  "brands": ["Dell", "HP", "Lenovo", "Apple", "Sony", "Epson", "Canon", "LG", "Blue Yeti", "Bose"],
+  "locations": ["IT Floor - 2", "Meeting Room", "HR Office", "Conf. Room B2", "Studio Room", "Admin Office"],
+  "departments": ["IT Department", "HR Department", "Meeting Room", "Marketing", "Admin Department"]
+}

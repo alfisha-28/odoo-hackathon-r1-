@@ -1,0 +1,205 @@
+{
+  "tabs": [
+    "Departments",
+    "Asset Categories",
+    "Employees"
+  ],
+  "departments": [
+    {
+      "id": 1,
+      "name": "IT Department",
+      "head": "Priya Shah",
+      "assets": 320,
+      "employees": 18,
+      "status": "Active"
+    },
+    {
+      "id": 2,
+      "name": "Finance Department",
+      "head": "Rohan Mehta",
+      "assets": 210,
+      "employees": 12,
+      "status": "Active"
+    },
+    {
+      "id": 3,
+      "name": "HR Department",
+      "head": "Neha Patil",
+      "assets": 150,
+      "employees": 10,
+      "status": "Active"
+    },
+    {
+      "id": 4,
+      "name": "Marketing Department",
+      "head": "Ankit Verma",
+      "assets": 180,
+      "employees": 14,
+      "status": "Active"
+    },
+    {
+      "id": 5,
+      "name": "Operations Department",
+      "head": "Sanjay Kumar",
+      "assets": 220,
+      "employees": 16,
+      "status": "Active"
+    },
+    {
+      "id": 6,
+      "name": "Facilities Department",
+      "head": "Vikram Singh",
+      "assets": 100,
+      "employees": 8,
+      "status": "Inactive"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "IT Assets",
+      "assets": 350,
+      "status": "Active"
+    },
+    {
+      "id": 2,
+      "name": "Office Equipment",
+      "assets": 280,
+      "status": "Active"
+    },
+    {
+      "id": 3,
+      "name": "Furniture & Fixtures",
+      "assets": 180,
+      "status": "Active"
+    },
+    {
+      "id": 4,
+      "name": "Electrical Assets",
+      "assets": 120,
+      "status": "Active"
+    },
+    {
+      "id": 5,
+      "name": "Vehicles",
+      "assets": 60,
+      "status": "Active"
+    },
+    {
+      "id": 6,
+      "name": "Others",
+      "assets": 50,
+      "status": "Inactive"
+    }
+  ],
+  "employees": [
+    {
+      "id": 1,
+      "name": "Priya Shah",
+      "email": "priya.shah@flowsync.com",
+      "role": "Admin",
+      "department": "IT Department",
+      "phone": "+91 98765 43210",
+      "status": "Active"
+    },
+    {
+      "id": 2,
+      "name": "Rohan Mehta",
+      "email": "rohan.mehta@flowsync.com",
+      "role": "Manager",
+      "department": "Finance Department",
+      "phone": "+91 91234 56789",
+      "status": "Active"
+    },
+    {
+      "id": 3,
+      "name": "Neha Patil",
+      "email": "neha.patil@flowsync.com",
+      "role": "Manager",
+      "department": "HR Department",
+      "phone": "+91 99876 54321",
+      "status": "Active"
+    },
+    {
+      "id": 4,
+      "name": "Ankit Verma",
+      "email": "ankit.verma@flowsync.com",
+      "role": "User",
+      "department": "Marketing Department",
+      "phone": "+91 90011 22334",
+      "status": "Active"
+    },
+    {
+      "id": 5,
+      "name": "Sanjay Kumar",
+      "email": "sanjay.kumar@flowsync.com",
+      "role": "User",
+      "department": "Operations Department",
+      "phone": "+91 87777 66554",
+      "status": "Active"
+    },
+    {
+      "id": 6,
+      "name": "Vikram Singh",
+      "email": "vikram.singh@flowsync.com",
+      "role": "User",
+      "department": "Facilities Department",
+      "phone": "+91 95555 44433",
+      "status": "Inactive"
+    },
+    {
+      "id": 7,
+      "name": "Amit Sharma",
+      "email": "amit.sharma@flowsync.com",
+      "role": "User",
+      "department": "IT Department",
+      "phone": "+91 90022 33445",
+      "status": "Active"
+    },
+    {
+      "id": 8,
+      "name": "Sneha Roy",
+      "email": "sneha.roy@flowsync.com",
+      "role": "Manager",
+      "department": "HR Department",
+      "phone": "+91 98888 77766",
+      "status": "Active"
+    },
+    {
+      "id": 9,
+      "name": "Karan Mehta",
+      "email": "karan.mehta@flowsync.com",
+      "role": "User",
+      "department": "Finance Department",
+      "phone": "+91 92222 33344",
+      "status": "Active"
+    },
+    {
+      "id": 10,
+      "name": "Rahul Verma",
+      "email": "rahul.verma@flowsync.com",
+      "role": "User",
+      "department": "IT Department",
+      "phone": "+91 93333 44455",
+      "status": "Active"
+    },
+    {
+      "id": 11,
+      "name": "Neha Kapoor",
+      "email": "neha.kapoor@flowsync.com",
+      "role": "User",
+      "department": "Marketing Department",
+      "phone": "+91 94444 55566",
+      "status": "Active"
+    },
+    {
+      "id": 12,
+      "name": "Rajesh Gupta",
+      "email": "rajesh.gupta@flowsync.com",
+      "role": "User",
+      "department": "Admin Department",
+      "phone": "+91 96666 77788",
+      "status": "Active"
+    }
+  ]
+}
