@@ -1,0 +1,216 @@
+{
+  "stats": [
+    {
+      "id": "all-notifications",
+      "title": "All Notifications",
+      "value": "8",
+      "subtitle": "Total",
+      "icon": "Bell",
+      "color": "purple"
+    },
+    {
+      "id": "unread",
+      "title": "Unread",
+      "value": "5",
+      "subtitle": "New notifications",
+      "icon": "Mail",
+      "color": "blue"
+    },
+    {
+      "id": "this-week",
+      "title": "This Week",
+      "value": "20",
+      "subtitle": "All received",
+      "icon": "CheckCircle2",
+      "color": "green"
+    },
+    {
+      "id": "today",
+      "title": "Today",
+      "value": "3",
+      "subtitle": "Recent activity",
+      "icon": "Clock3",
+      "color": "orange"
+    }
+  ],
+  "tabs": [
+    { "id": "all", "label": "All" },
+    { "id": "unread", "label": "Unread" },
+    { "id": "today", "label": "Today" },
+    { "id": "thisWeek", "label": "This Week" },
+    { "id": "thisMonth", "label": "This Month" }
+  ],
+  "categories": [
+    { "id": "all", "label": "All Notifications", "icon": "Bell", "count": 8 },
+    { "id": "Asset", "label": "Asset Related", "icon": "Package", "count": 3 },
+    { "id": "Booking", "label": "Booking Related", "icon": "CalendarDays", "count": 2 },
+    { "id": "Maintenance", "label": "Maintenance", "icon": "Wrench", "count": 2 },
+    { "id": "Audit", "label": "Audit & Compliance", "icon": "ShieldCheck", "count": 1 }
+  ],
+  "notificationTypes": [
+    "Asset",
+    "Booking",
+    "Maintenance",
+    "Audit",
+    "Allocation",
+    "System",
+    "Reports"
+  ],
+  "notifications": [
+    {
+      "id": 1,
+      "title": "Asset Assigned",
+      "description": "Laptop Dell XPS 13 (AF-0001) has been assigned to Priya Shah.",
+      "type": "Asset",
+      "status": "Unread",
+      "createdAt": "2025-05-20T10:30:00",
+      "module": "Assets",
+      "relatedEntity": { "type": "Asset", "id": "AF-0001", "name": "Dell XPS 13" },
+      "timeline": [
+        { "title": "Notification Created", "time": "20 May 2025, 10:30 AM" },
+        { "title": "Delivered in app", "time": "20 May 2025, 10:30 AM" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Booking Confirmed",
+      "description": "Your booking for Meeting Room A on 22 May 2025 is confirmed.",
+      "type": "Booking",
+      "status": "Unread",
+      "createdAt": "2025-05-20T09:15:00",
+      "module": "Booking",
+      "relatedEntity": { "type": "Booking", "id": "BK-2025-0104", "name": "Meeting Room A" },
+      "timeline": [
+        { "title": "Notification Created", "time": "20 May 2025, 09:15 AM" },
+        { "title": "Delivered in app", "time": "20 May 2025, 09:15 AM" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Maintenance Approved",
+      "description": "Maintenance request MT-2025-0036 for AC Unit has been approved.",
+      "type": "Maintenance",
+      "status": "Read",
+      "createdAt": "2025-05-20T07:45:00",
+      "module": "Maintenance",
+      "relatedEntity": { "type": "Ticket", "id": "MT-2025-0036", "name": "AC Unit Repair" },
+      "timeline": [
+        { "title": "Notification Created", "time": "20 May 2025, 07:45 AM" },
+        { "title": "Delivered in app", "time": "20 May 2025, 07:45 AM" },
+        { "title": "Viewed by User", "time": "20 May 2025, 08:30 AM" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Overdue Return",
+      "description": "Projector Epson (PR-0012) is overdue. Please return as soon as possible.",
+      "type": "Asset",
+      "status": "Read",
+      "createdAt": "2025-05-19T18:20:00",
+      "module": "Assets",
+      "relatedEntity": { "type": "Asset", "id": "PR-0012", "name": "Projector Epson" },
+      "timeline": [
+        { "title": "Notification Created", "time": "19 May 2025, 06:20 PM" },
+        { "title": "Delivered in app", "time": "19 May 2025, 06:20 PM" },
+        { "title": "Viewed by User", "time": "19 May 2025, 07:05 PM" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Audit Scheduled",
+      "description": "IT Assets Audit - May 2025 is scheduled on 26 May 2025.",
+      "type": "Audit",
+      "status": "Read",
+      "createdAt": "2025-05-19T11:10:00",
+      "module": "Audit",
+      "relatedEntity": { "type": "Audit", "id": "AU-2025-0028", "name": "IT Assets Audit" },
+      "timeline": [
+        { "title": "Notification Created", "time": "19 May 2025, 11:10 AM" },
+        { "title": "Delivered in app", "time": "19 May 2025, 11:10 AM" },
+        { "title": "Viewed by User", "time": "19 May 2025, 11:45 AM" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Transfer Request Approved",
+      "description": "Your transfer request for Office Chair (OC-0023) has been approved.",
+      "type": "Allocation",
+      "status": "Read",
+      "createdAt": "2025-05-18T16:30:00",
+      "module": "Allocation",
+      "relatedEntity": { "type": "Transfer", "id": "TR-2025-0012", "name": "Office Chair" },
+      "timeline": [
+        { "title": "Notification Created", "time": "18 May 2025, 04:30 PM" },
+        { "title": "Delivered in app", "time": "18 May 2025, 04:30 PM" },
+        { "title": "Viewed by User", "time": "18 May 2025, 05:00 PM" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "System Notification",
+      "description": "Monthly system backup completed successfully.",
+      "type": "System",
+      "status": "Read",
+      "createdAt": "2025-05-17T23:00:00",
+      "module": "System",
+      "relatedEntity": { "type": "System", "id": "SYS-BK-009", "name": "System Backup" },
+      "timeline": [
+        { "title": "Notification Created", "time": "17 May 2025, 11:00 PM" },
+        { "title": "Delivered in app", "time": "17 May 2025, 11:00 PM" },
+        { "title": "Viewed by User", "time": "18 May 2025, 09:00 AM" }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Audit Report Published",
+      "description": "Audit report for Office Equipment Audit - April 2025 is now available.",
+      "type": "Audit",
+      "status": "Read",
+      "createdAt": "2025-05-16T14:15:00",
+      "module": "Audit",
+      "relatedEntity": { "type": "Report", "id": "RP-AUD-2025-04", "name": "Audit Report" },
+      "timeline": [
+        { "title": "Notification Created", "time": "16 May 2025, 02:15 PM" },
+        { "title": "Delivered in app", "time": "16 May 2025, 02:15 PM" },
+        { "title": "Viewed by User", "time": "16 May 2025, 03:00 PM" }
+      ]
+    }
+  ],
+  "settings": {
+    "assets": {
+      "newAsset": true,
+      "allocation": true,
+      "returns": true
+    },
+    "booking": {
+      "bookingConfirmed": true,
+      "bookingCancelled": true,
+      "bookingReminder": true
+    },
+    "maintenance": {
+      "newTicket": true,
+      "statusUpdated": true,
+      "maintenanceCompleted": true
+    },
+    "audit": {
+      "auditScheduled": true,
+      "auditCompleted": true,
+      "complianceAlerts": true
+    },
+    "reports": {
+      "weeklyReports": true,
+      "monthlyReports": true,
+      "analyticsSummary": false
+    },
+    "delivery": {
+      "inApp": true,
+      "email": true,
+      "sms": false
+    },
+    "quietHours": {
+      "enabled": false,
+      "startTime": "22:00",
+      "endTime": "07:00"
+    }
+  }
+}

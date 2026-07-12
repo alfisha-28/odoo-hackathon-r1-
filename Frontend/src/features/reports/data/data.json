@@ -1,0 +1,112 @@
+{
+  "stats": [
+    {
+      "id": "total-assets",
+      "title": "Total Assets",
+      "value": "1,248",
+      "change": "12%",
+      "isPositive": true,
+      "icon": "Package",
+      "color": "purple",
+      "subtitle": "vs last month"
+    },
+    {
+      "id": "assets-in-use",
+      "title": "Assets in Use",
+      "value": "842",
+      "change": "8%",
+      "isPositive": true,
+      "icon": "Activity",
+      "color": "green",
+      "subtitle": "vs last month"
+    },
+    {
+      "id": "total-bookings",
+      "title": "Total Bookings",
+      "value": "326",
+      "change": "15%",
+      "isPositive": true,
+      "icon": "Calendar",
+      "color": "orange",
+      "subtitle": "vs last month"
+    },
+    {
+      "id": "maintenance-tickets",
+      "title": "Maintenance Tickets",
+      "value": "78",
+      "change": "6%",
+      "isPositive": false,
+      "icon": "Wrench",
+      "color": "blue",
+      "subtitle": "vs last month"
+    },
+    {
+      "id": "audit-compliance",
+      "title": "Audit Compliance",
+      "value": "98%",
+      "change": "3%",
+      "isPositive": true,
+      "icon": "ShieldCheck",
+      "color": "red",
+      "subtitle": "vs last month"
+    }
+  ],
+  "assetUtilization": [
+    { "category": "IT Assets", "inUse": 320, "available": 80, "maintenance": 20 },
+    { "category": "Office Equipment", "inUse": 250, "available": 60, "maintenance": 15 },
+    { "category": "Furniture", "inUse": 180, "available": 70, "maintenance": 10 },
+    { "category": "Vehicles", "inUse": 120, "available": 50, "maintenance": 5 },
+    { "category": "Electrical", "inUse": 90, "available": 30, "maintenance": 8 },
+    { "category": "Others", "inUse": 60, "available": 25, "maintenance": 5 }
+  ],
+  "assetStatus": [
+    { "name": "In Use", "value": 842, "color": "#7C3AED", "percentage": "67.5%" },
+    { "name": "Available", "value": 298, "color": "#A78BFA", "percentage": "23.9%" },
+    { "name": "Under Maintenance", "value": 78, "color": "#F59E0B", "percentage": "6.3%" },
+    { "name": "Retired", "value": 30, "color": "#6B7280", "percentage": "2.4%" }
+  ],
+  "departmentAllocation": [
+    { "department": "IT Department", "allocated": 320, "utilization": 85, "availability": 15 },
+    { "department": "Finance Department", "allocated": 210, "utilization": 78, "availability": 22 },
+    { "department": "HR Department", "allocated": 150, "utilization": 70, "availability": 30 },
+    { "department": "Marketing Department", "allocated": 180, "utilization": 82, "availability": 18 },
+    { "department": "Operations Department", "allocated": 220, "utilization": 75, "availability": 25 },
+    { "department": "Others", "allocated": 168, "utilization": 68, "availability": 32 }
+  ],
+  "maintenanceTrend": [
+    { "date": "12 May", "created": 45, "resolved": 30 },
+    { "date": "13 May", "created": 52, "resolved": 35 },
+    { "date": "14 May", "created": 48, "resolved": 40 },
+    { "date": "15 May", "created": 65, "resolved": 42 },
+    { "date": "16 May", "created": 55, "resolved": 48 },
+    { "date": "17 May", "created": 60, "resolved": 46 },
+    { "date": "18 May", "created": 50, "resolved": 38 }
+  ],
+  "categoryUtilization": [
+    { "category": "Laptops", "percentage": 92 },
+    { "category": "Projectors", "percentage": 87 },
+    { "category": "Office Chairs", "percentage": 75 },
+    { "category": "Printers", "percentage": 70 },
+    { "category": "Meeting Rooms", "percentage": 65 }
+  ],
+  "reportTypes": [
+    "Asset Summary",
+    "Maintenance Report",
+    "Audit Report",
+    "Booking Report",
+    "Executive Dashboard"
+  ],
+  "frequencies": [
+    "Daily",
+    "Weekly",
+    "Monthly",
+    "Quarterly"
+  ],
+  "recipients": [
+    "sarah.johnson@flowsync.com",
+    "john.doe@flowsync.com",
+    "operations@flowsync.com",
+    "finance-alerts@flowsync.com",
+    "it-support@flowsync.com"
+  ]
+}

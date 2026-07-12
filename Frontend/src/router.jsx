@@ -9,6 +9,8 @@ import AllocationPage from './features/allocation/pages/AllocationPage';
 import ResourceBookingPage from './features/booking/pages/ResourceBookingPage';
 import MaintenancePage from './features/maintenance/pages/MaintenancePage';
 import AuditPage from './features/audit/pages/AuditPage';
+import ReportsPage from './features/reports/pages/ReportsPage';
+import NotificationsPage from './features/notifications/pages/NotificationsPage';
 import DashboardLayout from './shared/components/DashboardLayout';
 
 function ProtectedRoute({ children }) {
@@ -69,6 +71,14 @@ const router = createBrowserRouter([
       {
         path: '/audit',
         element: <AuditPage />,
+      },
+      {
+        path: '/reports',
+        element: <ReportsPage />,
+      },
+      {
+        path: '/notifications',
+        element: <NotificationsPage />,
       },
     ],
   },

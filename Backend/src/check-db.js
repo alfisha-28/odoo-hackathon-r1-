@@ -10,8 +10,8 @@ async function checkConnection() {
 
     // Check if models exist (i.e. migrations run)
     try {
-      const count = await prisma.healthCheck.count();
-      logger.info(`Database Sanity Check: HealthCheck table accessible. Row count: ${count}`);
+      const count = await prisma.organization.count();
+      logger.info(`Database Sanity Check: Organization table accessible. Row count: ${count}`);
     } catch (dbError) {
       logger.warn(
         { err: dbError.message },
