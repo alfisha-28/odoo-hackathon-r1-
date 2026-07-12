@@ -1,0 +1,4 @@
+.agent
+gitignore
+.env
+node_modules
