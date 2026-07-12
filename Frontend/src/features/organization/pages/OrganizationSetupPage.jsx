@@ -150,6 +150,17 @@ export default function OrganizationSetupPage() {
     alert(`Deleting item ID ${id} in ${section}`);
   };
 
+  const handleRoleChange = async (employeeId, newRole) => {
+    try {
+      await organizationService.updateEmployee(employeeId, { roles: [newRole] });
+      await fetchEmployees();
+      alert('Employee role updated successfully!');
+    } catch (err) {
+      console.error('Failed to update employee role:', err);
+      alert(err.response?.data?.message || 'Failed to update employee role.');
+    }
+  };
+
   return (
     <>
       {showCategoryModal && (
@@ -289,13 +300,13 @@ export default function OrganizationSetupPage() {
                     </div>
 
                     {/* Add Employee button */}
-                    <button
+                    {/* <button
                       onClick={handleAddEmployee}
                       className="flex items-center justify-center gap-1 h-9 px-3 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-bold rounded-xl shadow-md shadow-[#7C3AED]/15 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer select-none"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Add Employee</span>
-                    </button>
+                    </button> */}
                   </div>
                 }
               />
@@ -304,6 +315,7 @@ export default function OrganizationSetupPage() {
                   employees={employees}
                   onEdit={(id) => handleEdit('employees', id)}
                   onDelete={(id) => handleDelete('employees', id)}
+                  onRoleChange={handleRoleChange}
                 />
               </div>
 

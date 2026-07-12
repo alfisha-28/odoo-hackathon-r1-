@@ -1,7 +1,6 @@
 import React from 'react';
 import DataTable from './DataTable';
 import StatusBadge from './StatusBadge';
-import RoleBadge from './RoleBadge';
 import ActionButtons from './ActionButtons';
 
 const headers = [
@@ -24,7 +23,40 @@ const getInitials = (name) => {
     .slice(0, 2);
 };
 
-export default function EmployeeTable({ employees = [], onEdit, onDelete }) {
+const roleStyles = {
+  ADMIN: 'bg-[#F5F3FF] text-[#7C3AED] border-[#EDE9FE]',
+  ASSET_MANAGER: 'bg-[#EFF6FF] text-[#2563EB] border-[#DBEAFE]',
+  DEPARTMENT_HEAD: 'bg-[#FFFBEB] text-[#D97706] border-[#FEF3C7]',
+  EMPLOYEE: 'bg-[#F0FDF4] text-[#16A34A] border-[#DCFCE7]',
+};
+
+function RoleSelect({ currentRole, onChange }) {
+  const normRole = (currentRole || 'EMPLOYEE').toUpperCase();
+  const style = roleStyles[normRole] || roleStyles.EMPLOYEE;
+
+  return (
+    <div className="relative inline-block select-none">
+      <select
+        value={normRole}
+        onChange={(e) => onChange && onChange(e.target.value)}
+        className={`px-2.5 py-1 text-[10px] font-extrabold rounded-lg border ${style} appearance-none pr-6 cursor-pointer select-none transition-all duration-250 hover:scale-105 outline-none font-sans`}
+        style={{
+          backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'right 6px center',
+          backgroundSize: '10px',
+        }}
+      >
+        <option value="EMPLOYEE">EMPLOYEE</option>
+        <option value="DEPARTMENT_HEAD">DEPARTMENT HEAD</option>
+        <option value="ASSET_MANAGER">ASSET MANAGER</option>
+        <option value="ADMIN">ADMIN</option>
+      </select>
+    </div>
+  );
+}
+
+export default function EmployeeTable({ employees = [], onEdit, onDelete, onRoleChange }) {
   const renderRow = (emp) => (
     <tr
       key={emp.id}
@@ -47,13 +79,14 @@ export default function EmployeeTable({ employees = [], onEdit, onDelete }) {
 
       {/* Role */}
       <td className="py-3.5 px-4 align-middle">
-        <div className="flex flex-wrap gap-1">
-          {Array.isArray(emp.roles) && emp.roles.length > 0 ? (
-            emp.roles.map((r) => <RoleBadge key={r} role={r} />)
-          ) : (
-            <RoleBadge role={emp.role} /> /* fallback for older mock data */
-          )}
-        </div>
+        <RoleSelect
+          currentRole={
+            Array.isArray(emp.roles) && emp.roles.length > 0
+              ? emp.roles[0]
+              : emp.role || 'EMPLOYEE'
+          }
+          onChange={(newRole) => onRoleChange && onRoleChange(emp.id, newRole)}
+        />
       </td>
 
       {/* Department */}

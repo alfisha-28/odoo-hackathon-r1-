@@ -42,11 +42,83 @@ export default function MaintenancePage() {
     setLoading(true);
     try {
       const { maintenanceService } = await import('../services/maintenanceService');
-      const data = await maintenanceService.getMaintenanceRequests({
-        status: selectedStatus,
-        priority: selectedPriority,
+      const data = await maintenanceService.getMaintenanceRequests();
+
+      const mapStatus = (backendStatus) => {
+        switch (backendStatus) {
+          case 'PENDING':
+          case 'APPROVED':
+            return 'Open';
+          case 'TECHNICIAN_ASSIGNED':
+          case 'IN_PROGRESS':
+            return 'In Progress';
+          case 'RESOLVED':
+            return 'Resolved';
+          case 'REJECTED':
+            return 'Closed';
+          default:
+            return 'Open';
+        }
+      };
+
+      const mapped = (data || []).map((t) => {
+        const createdDate = new Date(t.createdAt || Date.now());
+        const dueDate = new Date(createdDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+        const yyyy = dueDate.getFullYear();
+        const mm = String(dueDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(dueDate.getDate()).padStart(2, '0');
+        const dueDateStr = `${yyyy}-${mm}-${dd}`;
+
+        const yyyyReport = createdDate.getFullYear();
+        const mmReport = String(createdDate.getMonth() + 1).padStart(2, '0');
+        const ddReport = String(createdDate.getDate()).padStart(2, '0');
+        const reportedDateStr = `${yyyyReport}-${mmReport}-${ddReport}`;
+
+        let priority = 'Medium';
+        if (t.priority === 'LOW') priority = 'Low';
+        else if (t.priority === 'HIGH') priority = 'High';
+        else if (t.priority === 'URGENT') priority = 'Critical';
+
+        let category = 'Other';
+        const desc = (t.issueDescription || '').toLowerCase();
+        if (desc.includes('fail') || desc.includes('broke') || desc.includes('crash') || desc.includes('damage') || desc.includes('power') || desc.includes('fault')) {
+          category = 'Hardware Failure';
+        } else if (desc.includes('slow') || desc.includes('freeze') || desc.includes('lag') || desc.includes('performance')) {
+          category = 'Performance Issue';
+        } else if (desc.includes('scratch') || desc.includes('dirty') || desc.includes('tear') || desc.includes('wear')) {
+          category = 'Wear & Tear';
+        } else if (desc.includes('software') || desc.includes('bug') || desc.includes('app') || desc.includes('os') || desc.includes('windows') || desc.includes('linux')) {
+          category = 'Software Issue';
+        }
+
+        return {
+          id: t.id,
+          asset: t.asset ? {
+            id: t.asset.id,
+            name: t.asset.name,
+            code: t.asset.assetTag,
+            image: '',
+          } : null,
+          reportedBy: t.reportedBy ? {
+            name: t.reportedBy.name,
+            avatar: '',
+            department: 'Operations',
+          } : {
+            name: 'System Employee',
+            avatar: '',
+            department: 'Operations',
+          },
+          issue: t.issueDescription || 'No description provided',
+          priority,
+          status: mapStatus(t.status),
+          rawStatus: t.status,
+          dueDate: dueDateStr,
+          reportedDate: reportedDateStr,
+          category,
+        };
       });
-      setTickets(data || []);
+
+      setTickets(mapped);
     } catch (err) {
       console.error('Failed to fetch maintenance tickets:', err);
     } finally {
@@ -56,14 +128,14 @@ export default function MaintenancePage() {
 
   useEffect(() => {
     fetchTickets();
-  }, [selectedStatus, selectedPriority]);
+  }, []);
 
   // Sync statistics dynamically with list state
   const computedStats = useMemo(() => {
-    const total = tickets.length + 29; // Seeded to maintain match with 36 total
-    const open = tickets.filter((t) => t.status === 'Open').length + 13;
-    const progress = tickets.filter((t) => t.status === 'In Progress').length + 8;
-    const resolved = tickets.filter((t) => t.status === 'Resolved').length + 7;
+    const total = tickets.length;
+    const open = tickets.filter((t) => t.status === 'Open').length;
+    const progress = tickets.filter((t) => t.status === 'In Progress').length;
+    const resolved = tickets.filter((t) => t.status === 'Resolved').length;
 
     return [
       {
@@ -103,15 +175,15 @@ export default function MaintenancePage() {
 
   // Sync donut chart overview dynamically
   const computedOverview = useMemo(() => {
-    const open = tickets.filter((t) => t.status === 'Open').length + 13;
-    const progress = tickets.filter((t) => t.status === 'In Progress').length + 8;
-    const resolved = tickets.filter((t) => t.status === 'Resolved').length + 7;
+    const open = tickets.filter((t) => t.status === 'Open').length;
+    const progress = tickets.filter((t) => t.status === 'In Progress').length;
+    const resolved = tickets.filter((t) => t.status === 'Resolved').length;
     const overdue = tickets.filter((t) => {
       if (t.status === 'Resolved' || t.status === 'Closed' || t.status === 'Cancelled') return false;
-      return t.dueDate < '2025-05-15';
-    }).length + 1;
+      return new Date(t.dueDate) < new Date();
+    }).length;
 
-    const total = open + progress + resolved + overdue;
+    const total = open + progress + resolved + overdue || 1;
 
     return [
       { name: 'Open', value: open, percentage: Math.round((open / total) * 100), color: '#F59E0B' },
@@ -139,11 +211,11 @@ export default function MaintenancePage() {
     });
 
     return [
-      { name: 'Hardware Failure', value: counts['Hardware Failure'] + 10 },
-      { name: 'Performance Issue', value: counts['Performance Issue'] + 8 },
-      { name: 'Wear & Tear', value: counts['Wear & Tear'] + 4 },
-      { name: 'Software Issue', value: counts['Software Issue'] + 4 },
-      { name: 'Other', value: counts['Other'] + 3 },
+      { name: 'Hardware Failure', value: counts['Hardware Failure'] },
+      { name: 'Performance Issue', value: counts['Performance Issue'] },
+      { name: 'Wear & Tear', value: counts['Wear & Tear'] },
+      { name: 'Software Issue', value: counts['Software Issue'] },
+      { name: 'Other', value: counts['Other'] },
     ];
   }, [tickets]);
 
@@ -271,12 +343,22 @@ export default function MaintenancePage() {
   const handleNewRequestSubmit = async (formData) => {
     try {
       const { maintenanceService } = await import('../services/maintenanceService');
-      await maintenanceService.raiseRequest({
+      const payload = {
         assetId: formData.assetId || formData.asset,
         issueDescription: formData.description || formData.title,
-        priority: formData.priority,
-        photoUrl: formData.attachment ? 'https://example.com/photo.jpg' : null,
-      });
+        priority: (formData.priority || 'MEDIUM').toUpperCase(),
+      };
+      
+      // Map 'CRITICAL' if it is selected (Critical -> CRITICAL)
+      if (payload.priority === 'CRITICAL') {
+        payload.priority = 'CRITICAL';
+      }
+
+      if (formData.attachment) {
+        payload.photoUrl = 'https://example.com/photo.jpg';
+      }
+
+      await maintenanceService.raiseRequest(payload);
 
       setIsNewModalOpen(false);
       alert(`Maintenance Ticket submitted successfully!`);

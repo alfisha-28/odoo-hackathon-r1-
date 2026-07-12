@@ -5,8 +5,8 @@ export const maintenanceService = {
     const response = await apiClient.get('/maintenance', {
       params: { status, priority },
     });
-    // Returns: { success: true, data: { requests: [...] } }
-    return response.data.data.requests;
+    // Returns: { success: true, data: { data: [...], meta: {...} } }
+    return response.data.data.data;
   },
 
   raiseRequest: async (requestData) => {

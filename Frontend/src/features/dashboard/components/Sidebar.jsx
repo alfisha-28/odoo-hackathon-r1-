@@ -65,6 +65,13 @@ export default function Sidebar({
       .slice(0, 2);
   };
 
+  const filteredNavItems = navItems.filter((item) => {
+    if (item.name === 'Organization Setup') {
+      return user?.roles?.includes('ADMIN');
+    }
+    return true;
+  });
+
   return (
     <>
       {/* Mobile Drawer Backdrop */}
@@ -93,7 +100,7 @@ export default function Sidebar({
             <Lucide.ChevronLeft className="w-4 h-4" />
           )}
         </button>
-
+ 
         {/* Top: Logo */}
         <div className={`px-7 py--4 flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
           {isCollapsed ? (
@@ -105,7 +112,7 @@ export default function Sidebar({
 
         {/* Middle: Navigation Links */}
         <nav className="flex-grow px-3 mt-4 overflow-y-auto no-scrollbar flex flex-col gap-1">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const isSubitemActive = item.subItems && item.subItems.some((sub) => sub.name === activePage);
             const isActive = activePage === item.name || isSubitemActive;
             const isExpanded = !!expandedMenus[item.name];

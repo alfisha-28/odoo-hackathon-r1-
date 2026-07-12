@@ -11,7 +11,35 @@ export const allocationService = {
   },
 
   allocateAsset: async (allocationData) => {
-    const response = await apiClient.post('/allocations', allocationData);
+    const payload = {
+      assetId: allocationData.assetId,
+    };
+
+    if (allocationData.allocatedToEmpId && allocationData.allocatedToEmpId.trim() !== '') {
+      payload.allocatedToEmpId = allocationData.allocatedToEmpId;
+    } else if (allocationData.assigneeId && allocationData.assigneeId.trim() !== '') {
+      payload.allocatedToEmpId = allocationData.assigneeId;
+    }
+
+    if (allocationData.allocatedToDeptId && allocationData.allocatedToDeptId.trim() !== '') {
+      payload.allocatedToDeptId = allocationData.allocatedToDeptId;
+    } else if (allocationData.departmentId && allocationData.departmentId.trim() !== '') {
+      payload.allocatedToDeptId = allocationData.departmentId;
+    }
+
+    const dateStr = allocationData.expectedReturnDate || allocationData.dueDate;
+    if (dateStr) {
+      try {
+        const date = new Date(dateStr);
+        if (!isNaN(date.getTime())) {
+          payload.expectedReturnDate = date.toISOString();
+        }
+      } catch (err) {
+        console.error("Failed to parse expectedReturnDate:", err);
+      }
+    }
+
+    const response = await apiClient.post('/allocations', payload);
     return response.data.data.allocation;
   },
 

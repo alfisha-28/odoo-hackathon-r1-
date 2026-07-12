@@ -44,8 +44,88 @@ export default function ResourceBookingPage() {
     setLoading(true);
     try {
       const { bookingService } = await import('../services/bookingService');
-      const data = await bookingService.getBookings(); // Fetch all bookings initially
-      setBookings(data || []);
+      const data = await bookingService.getBookings();
+
+      const getResourceType = (name = '') => {
+        const lower = name.toLowerCase();
+        if (lower.includes('laptop') || lower.includes('macbook') || lower.includes('xps') || lower.includes('thinkpad')) return 'Laptop';
+        if (lower.includes('room') || lower.includes('hall') || lower.includes('office') || lower.includes('studio')) return 'Conference Room';
+        if (lower.includes('car') || lower.includes('vehicle') || lower.includes('van') || lower.includes('tesla')) return 'Vehicle';
+        if (lower.includes('monitor') || lower.includes('screen') || lower.includes('display')) return 'Monitor';
+        return 'Equipment';
+      };
+
+      const mapped = (data || []).map((b) => {
+        let dateStr = '';
+        let startStr = '';
+        let endStr = '';
+
+        if (b.startTime) {
+          const sDate = new Date(b.startTime);
+          if (!isNaN(sDate.getTime())) {
+            const year = sDate.getFullYear();
+            const month = String(sDate.getMonth() + 1).padStart(2, '0');
+            const day = String(sDate.getDate()).padStart(2, '0');
+            dateStr = `${year}-${month}-${day}`;
+            startStr = `${String(sDate.getHours()).padStart(2, '0')}:${String(sDate.getMinutes()).padStart(2, '0')}`;
+          }
+        }
+
+        if (b.endTime) {
+          const eDate = new Date(b.endTime);
+          if (!isNaN(eDate.getTime())) {
+            endStr = `${String(eDate.getHours()).padStart(2, '0')}:${String(eDate.getMinutes()).padStart(2, '0')}`;
+          }
+        }
+
+        // Map status
+        let displayStatus = 'Pending';
+        if (b.status === 'UPCOMING') {
+          if (new Date(b.endTime) < new Date()) {
+            displayStatus = 'Completed';
+          } else {
+            displayStatus = 'Approved';
+          }
+        } else if (b.status === 'ONGOING') {
+          displayStatus = 'Approved';
+        } else if (b.status === 'COMPLETED') {
+          displayStatus = 'Completed';
+        } else if (b.status === 'CANCELLED') {
+          displayStatus = 'Cancelled';
+        }
+
+        // Overdue check
+        const isOverdue = b.status !== 'COMPLETED' && b.status !== 'CANCELLED' && new Date(b.endTime) < new Date();
+        if (isOverdue) {
+          displayStatus = 'Overdue';
+        }
+
+        return {
+          id: b.id,
+          date: dateStr,
+          startTime: startStr,
+          endTime: endStr,
+          startTimeRaw: b.startTime,
+          endTimeRaw: b.endTime,
+          purpose: b.purpose || 'No purpose specified',
+          status: displayStatus,
+          rawStatus: b.status,
+          resource: {
+            id: b.asset?.id || '',
+            name: b.asset?.name || 'Unknown Resource',
+            type: getResourceType(b.asset?.name || ''),
+            location: b.asset?.location || 'Main Office',
+          },
+          employee: {
+            id: b.bookedBy?.id || '',
+            name: b.bookedBy?.name || 'System User',
+            department: b.bookedForDept?.name || 'Operations',
+            avatar: '',
+          }
+        };
+      });
+
+      setBookings(mapped);
     } catch (err) {
       console.error('Failed to fetch bookings:', err);
     } finally {
@@ -59,8 +139,8 @@ export default function ResourceBookingPage() {
 
   // Compute dynamic stats based on current bookings state
   const computedStats = useMemo(() => {
-    const upcoming = bookings.filter((b) => b.status === 'Approved').length;
-    const active = bookings.filter((b) => b.status === 'Approved' && b.date === '2025-05-15').length || 12;
+    const upcoming = bookings.filter((b) => b.rawStatus === 'UPCOMING' && new Date(b.startTimeRaw) > new Date()).length;
+    const active = bookings.filter((b) => b.rawStatus === 'ONGOING' || (b.rawStatus === 'UPCOMING' && new Date(b.startTimeRaw) <= new Date() && new Date(b.endTimeRaw) >= new Date())).length;
     const pending = bookings.filter((b) => b.status === 'Pending').length;
     const overdue = bookings.filter((b) => b.status === 'Overdue').length;
 
@@ -68,7 +148,7 @@ export default function ResourceBookingPage() {
       {
         id: 'stat-upcoming',
         title: 'Upcoming Bookings',
-        value: upcoming, 
+        value: upcoming,
         subtitle: 'Next 7 Days',
         icon: 'CalendarDays',
         color: 'indigo',
@@ -208,10 +288,14 @@ export default function ResourceBookingPage() {
   const handleNewBookingSubmit = async (formData) => {
     try {
       const { bookingService } = await import('../services/bookingService');
+      
+      const startDateTime = new Date(`${formData.bookingDate}T${formData.startTime}`);
+      const endDateTime = new Date(`${formData.bookingDate}T${formData.endTime}`);
+      
       const payload = {
         assetId: formData.resourceId,
-        startTime: `${formData.bookingDate}T${formData.startTime}:00`,
-        endTime: `${formData.bookingDate}T${formData.endTime}:00`,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
         purpose: formData.purpose,
       };
 
@@ -228,13 +312,6 @@ export default function ResourceBookingPage() {
         alert(err.response?.data?.message || "Failed to create booking.");
       }
     }
-  };
-
-  const handleSaveDraft = (draftData) => {
-    console.log('Save Draft Booking Form Values:', draftData);
-    setIsNewModalOpen(false);
-    setQuickBookPrefilledType('');
-    alert('Resource booking saved as draft successfully!');
   };
 
   // Cancel Booking action inside Details modal
@@ -371,7 +448,6 @@ export default function ResourceBookingPage() {
         <BookingForm
           prefilledType={quickBookPrefilledType}
           onCancel={() => setIsNewModalOpen(false)}
-          onSaveDraft={handleSaveDraft}
           onSubmitSuccess={handleNewBookingSubmit}
         />
       </BookingModal>

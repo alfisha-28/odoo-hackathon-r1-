@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import FormInput from '../../assets/components/FormInput';
 import FormSelect from '../../assets/components/FormSelect';
@@ -30,20 +30,36 @@ export default function MaintenanceForm({ onCancel, onSaveDraft, onSubmitSuccess
     },
   });
 
-  // Extract unique assets list from the tickets data or create a default set
-  const assetOptions = useMemo(() => {
-    // Map ticket assets + additional known assets
-    const uniqueAssets = [
-      { value: 'AF-0001', label: 'Dell XPS 13 (AF-0001)' },
-      { value: 'PR-0021', label: 'HP LaserJet Pro (PR-0021)' },
-      { value: 'AC-0012', label: 'LG AC - 1.5 Ton (AC-0012)' },
-      { value: 'RM-0003', label: 'Meeting Room A (RM-0003)' },
-      { value: 'EG-0009', label: 'Generator G-34 (EG-0009)' },
-      { value: 'AF-0089', label: 'MacBook Pro 16" (AF-0089)' },
-      { value: 'AF-0088', label: 'iPad Pro 11" (AF-0088)' },
-      { value: 'AF-0120', label: 'Conference Desk (AF-0120)' },
-    ];
-    return uniqueAssets;
+  const [assetOptions, setAssetOptions] = useState([
+    { value: 'AF-0001', label: 'Dell XPS 13 (AF-0001)' },
+    { value: 'PR-0021', label: 'HP LaserJet Pro (PR-0021)' },
+    { value: 'AC-0012', label: 'LG AC - 1.5 Ton (AC-0012)' },
+    { value: 'RM-0003', label: 'Meeting Room A (RM-0003)' },
+    { value: 'EG-0009', label: 'Generator G-34 (EG-0009)' },
+    { value: 'AF-0089', label: 'MacBook Pro 16" (AF-0089)' },
+    { value: 'AF-0088', label: 'iPad Pro 11" (AF-0088)' },
+    { value: 'AF-0120', label: 'Conference Desk (AF-0120)' },
+  ]);
+
+  useEffect(() => {
+    const loadAssets = async () => {
+      try {
+        const { assetService } = await import('../../assets/services/assetService');
+        const data = await assetService.getAssets({ limit: 1000 });
+        const assetsList = data?.assets || data?.data || [];
+        if (assetsList.length > 0) {
+          setAssetOptions(
+            assetsList.map((a) => ({
+              value: a.id,
+              label: `${a.name} (${a.assetTag})`,
+            }))
+          );
+        }
+      } catch (e) {
+        console.error('Failed to load assets for maintenance form:', e);
+      }
+    };
+    loadAssets();
   }, []);
 
   const categoryOptions = useMemo(() => {

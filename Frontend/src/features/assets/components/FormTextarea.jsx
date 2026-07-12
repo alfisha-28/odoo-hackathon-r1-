@@ -1,7 +1,33 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 
 const FormTextarea = forwardRef(
-  ({ label, name, required, error, placeholder, maxLength = 500, value = '', ...props }, ref) => {
+  ({ label, name, required, error, placeholder, maxLength = 500, value, onChange, defaultValue, ...props }, ref) => {
+    const [localValue, setLocalValue] = useState(defaultValue || '');
+
+    const handleChange = (e) => {
+      setLocalValue(e.target.value);
+      if (onChange) {
+        onChange(e);
+      }
+    };
+
+    const currentLength = value !== undefined ? String(value).length : String(localValue).length;
+
+    const textareaProps = {
+      ref,
+      name,
+      placeholder,
+      maxLength,
+      onChange: handleChange,
+      ...props
+    };
+
+    if (value !== undefined) {
+      textareaProps.value = value;
+    } else if (defaultValue !== undefined) {
+      textareaProps.defaultValue = defaultValue;
+    }
+
     return (
       <div className="flex flex-col gap-1.5 w-full">
         {/* Label */}
@@ -14,19 +40,14 @@ const FormTextarea = forwardRef(
         {/* Textarea */}
         <div className="relative">
           <textarea
-            ref={ref}
-            name={name}
-            placeholder={placeholder}
-            maxLength={maxLength}
-            value={value}
             className={`w-full min-h-[110px] bg-white border rounded-xl p-4 text-xs font-semibold text-[#111827] placeholder-[#9CA3AF] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/15 focus:border-[#7C3AED] resize-none
               ${error ? 'border-[#EF4444] focus:ring-red-100' : 'border-[#E5E7EB]'}
             `}
-            {...props}
+            {...textareaProps}
           />
           {/* Character counter */}
           <div className="absolute bottom-3.5 right-4 text-[9px] font-bold text-[#9CA3AF] select-none">
-            {value.length} / {maxLength}
+            {currentLength} / {maxLength}
           </div>
         </div>
 

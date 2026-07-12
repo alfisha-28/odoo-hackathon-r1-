@@ -5,8 +5,8 @@ export const bookingService = {
     const response = await apiClient.get('/bookings', {
       params: { assetId, start, end },
     });
-    // Returns: { success: true, data: { bookings: [...] } }
-    return response.data.data.bookings;
+    // Returns: { success: true, data: { data: [...], meta: {...} } }
+    return response.data.data.data;
   },
 
   createBooking: async (bookingData) => {

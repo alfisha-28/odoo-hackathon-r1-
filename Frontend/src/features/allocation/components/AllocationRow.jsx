@@ -22,7 +22,7 @@ const formatDate = (dateStr) => {
 };
 
 export default function AllocationRow({ allocation, onView, onMore }) {
-  const AssetIcon = assetIcons[allocation.asset.image] || HelpCircle;
+  const AssetIcon = assetIcons[allocation.asset?.image] || HelpCircle;
 
   return (
     <tr className="border-b border-[#F3F4F6] transition-colors hover:bg-slate-50 select-none">
@@ -43,8 +43,8 @@ export default function AllocationRow({ allocation, onView, onMore }) {
             <AssetIcon className="w-4.5 h-4.5" />
           </div>
           <div className="flex flex-col">
-            <span className="text-xs font-black text-[#111827]">{allocation.asset.name}</span>
-            <span className="text-[10px] font-bold text-[#9CA3AF] mt-0.5">{allocation.asset.code}</span>
+            <span className="text-xs font-black text-[#111827]">{allocation.asset?.name}</span>
+            <span className="text-[10px] font-bold text-[#9CA3AF] mt-0.5">{allocation.asset?.code}</span>
           </div>
         </div>
       </td>
@@ -52,9 +52,9 @@ export default function AllocationRow({ allocation, onView, onMore }) {
       {/* Allocated To */}
       <td className="py-4.5 px-4 align-middle">
         <Avatar
-          name={allocation.employee.name}
-          role={allocation.employee.role}
-          avatar={allocation.employee.avatar}
+          name={allocation.employee?.name}
+          role={allocation.employee?.role}
+          avatar={allocation.employee?.avatar}
         />
       </td>
 

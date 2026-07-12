@@ -6,7 +6,22 @@ const statusStyles = {
     text: 'text-[#16A34A]',
     border: 'border-[#DCFCE7]',
   },
+  ACTIVE: {
+    bg: 'bg-[#EEFDF3]',
+    text: 'text-[#16A34A]',
+    border: 'border-[#DCFCE7]',
+  },
   Pending: {
+    bg: 'bg-[#FFF7ED]',
+    text: 'text-[#F97316]',
+    border: 'border-[#FFEDD5]',
+  },
+  PENDING: {
+    bg: 'bg-[#FFF7ED]',
+    text: 'text-[#F97316]',
+    border: 'border-[#FFEDD5]',
+  },
+  REQUESTED: {
     bg: 'bg-[#FFF7ED]',
     text: 'text-[#F97316]',
     border: 'border-[#FFEDD5]',
@@ -16,12 +31,37 @@ const statusStyles = {
     text: 'text-[#475569]',
     border: 'border-[#E2E8F0]',
   },
+  RETURNED: {
+    bg: 'bg-[#F8FAFC]',
+    text: 'text-[#475569]',
+    border: 'border-[#E2E8F0]',
+  },
   Completed: {
     bg: 'bg-[#EFF6FF]',
     text: 'text-[#2563EB]',
     border: 'border-[#DBEAFE]',
   },
+  COMPLETED: {
+    bg: 'bg-[#EFF6FF]',
+    text: 'text-[#2563EB]',
+    border: 'border-[#DBEAFE]',
+  },
+  APPROVED: {
+    bg: 'bg-[#EEFDF3]',
+    text: 'text-[#16A34A]',
+    border: 'border-[#DCFCE7]',
+  },
+  REJECTED: {
+    bg: 'bg-[#FEF2F2]',
+    text: 'text-[#EF4444]',
+    border: 'border-[#FEE2E2]',
+  },
   Overdue: {
+    bg: 'bg-[#FEF2F2]',
+    text: 'text-[#EF4444]',
+    border: 'border-[#FEE2E2]',
+  },
+  OVERDUE: {
     bg: 'bg-[#FEF2F2]',
     text: 'text-[#EF4444]',
     border: 'border-[#FEE2E2]',

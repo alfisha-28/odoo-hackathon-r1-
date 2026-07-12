@@ -1,21 +1,45 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import FormInput from '../../assets/components/FormInput';
 import FormSelect from '../../assets/components/FormSelect';
-import FormTextarea from '../../assets/components/FormTextarea';
 import DatePicker from '../../assets/components/DatePicker';
-import UploadArea from './UploadArea';
+import { assetService } from '../../assets/services/assetService';
+import { organizationService } from '../../organization/services/organizationService';
 
 import allocationData from '../data/data.json';
 
-export default function AllocationForm({ onCancel, onSaveDraft, onSubmitSuccess }) {
-  const [selectedFile, setSelectedFile] = useState(null);
+export default function AllocationForm({ onCancel, onSubmitSuccess }) {
+  const [dbAssets, setDbAssets] = useState([]);
+  const [dbEmployees, setDbEmployees] = useState([]);
+  const [dbDepartments, setDbDepartments] = useState([]);
+
+  useEffect(() => {
+    const loadFormData = async () => {
+      try {
+        const assetsRes = await assetService.getAssets({ limit: 100 });
+        setDbAssets(assetsRes.assets || assetsRes.data || []);
+      } catch (err) {
+        console.error("Failed to load assets for allocation form:", err);
+      }
+      try {
+        const employeesRes = await organizationService.getEmployees({ limit: 100 });
+        setDbEmployees(employeesRes.employees || employeesRes.data || []);
+      } catch (err) {
+        console.error("Failed to load employees for allocation form:", err);
+      }
+      try {
+        const departmentsRes = await organizationService.getDepartments();
+        setDbDepartments(departmentsRes || []);
+      } catch (err) {
+        console.error("Failed to load departments for allocation form:", err);
+      }
+    };
+    loadFormData();
+  }, []);
 
   const {
     register,
     handleSubmit,
     watch,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -25,9 +49,6 @@ export default function AllocationForm({ onCancel, onSaveDraft, onSubmitSuccess 
       departmentName: '',
       allocationDate: '',
       dueDate: '',
-      priority: '',
-      purpose: '',
-      notes: '',
     },
   });
 
@@ -35,35 +56,48 @@ export default function AllocationForm({ onCancel, onSaveDraft, onSubmitSuccess 
 
   // Load assets options
   const assetOptions = useMemo(() => {
+    if (dbAssets.length > 0) {
+      return dbAssets.map((asset) => ({
+        value: String(asset.id),
+        label: `${asset.name} (${asset.assetTag})`,
+      }));
+    }
     return allocationData.assets.map((asset) => ({
       value: String(asset.id),
       label: `${asset.name} (${asset.code})`,
     }));
-  }, []);
+  }, [dbAssets]);
 
   // Load employees options
   const employeeOptions = useMemo(() => {
+    if (dbEmployees.length > 0) {
+      return dbEmployees.map((emp) => ({
+        value: String(emp.id),
+        label: `${emp.name} (${emp.email})`,
+      }));
+    }
     return allocationData.employees.map((emp) => ({
       value: String(emp.id),
       label: `${emp.name} - ${emp.role}`,
     }));
-  }, []);
+  }, [dbEmployees]);
 
   // Load departments options
   const departmentOptions = useMemo(() => {
+    if (dbDepartments.length > 0) {
+      return dbDepartments.map((dept) => ({
+        value: String(dept.id),
+        label: dept.name,
+      }));
+    }
     return allocationData.departments.map((dept) => ({
       value: dept,
       label: dept,
     }));
-  }, []);
-
-  const handleSaveDraftClick = () => {
-    const values = getValues();
-    onSaveDraft({ ...values, attachment: selectedFile });
-  };
+  }, [dbDepartments]);
 
   const handleFormSubmit = (data) => {
-    onSubmitSuccess({ ...data, attachment: selectedFile });
+    onSubmitSuccess(data);
   };
 
   return (
@@ -136,12 +170,12 @@ export default function AllocationForm({ onCancel, onSaveDraft, onSubmitSuccess 
 
       <div className="border-t border-[#F3F4F6] w-full" />
 
-      {/* Section 2: Dates and Priority */}
+      {/* Section 2: Dates */}
       <div className="flex flex-col gap-4">
         <h3 className="text-xs font-black text-[#111827] uppercase tracking-wider select-none">
-          2. Schedule & Urgency
+          2. Schedule
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <DatePicker
             label="Allocation Date"
             required
@@ -155,51 +189,6 @@ export default function AllocationForm({ onCancel, onSaveDraft, onSubmitSuccess 
             error={errors.dueDate}
             {...register('dueDate', { required: 'Expected Return is required' })}
           />
-
-          <FormSelect
-            label="Priority Level"
-            placeholder="Select Priority"
-            required
-            options={['Low', 'Medium', 'High', 'Urgent']}
-            error={errors.priority}
-            {...register('priority', { required: 'Priority is required' })}
-          />
-        </div>
-      </div>
-
-      <div className="border-t border-[#F3F4F6] w-full" />
-
-      {/* Section 3: Purpose */}
-      <div className="flex flex-col gap-4">
-        <h3 className="text-xs font-black text-[#111827] uppercase tracking-wider select-none">
-          3. Usage Purpose
-        </h3>
-        <FormTextarea
-          label="Purpose / Reason"
-          placeholder="Reason for allocating this asset..."
-          required
-          maxLength={300}
-          error={errors.purpose}
-          {...register('purpose', { required: 'Allocation purpose is required' })}
-        />
-      </div>
-
-      <div className="border-t border-[#F3F4F6] w-full" />
-
-      {/* Section 4: Notes and Attachments */}
-      <div className="flex flex-col gap-4">
-        <h3 className="text-xs font-black text-[#111827] uppercase tracking-wider select-none">
-          4. Notes & Documentation
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
-          <FormTextarea
-            label="Internal Notes (Optional)"
-            placeholder="Add any extra notes or warnings..."
-            maxLength={300}
-            {...register('notes')}
-          />
-
-          <UploadArea label="Attachment" onFileSelect={setSelectedFile} />
         </div>
       </div>
 
@@ -213,16 +202,7 @@ export default function AllocationForm({ onCancel, onSaveDraft, onSubmitSuccess 
           Cancel
         </button>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-          <button
-            type="button"
-            onClick={handleSaveDraftClick}
-            disabled={isSubmitting}
-            className="w-full sm:w-auto h-11 px-5 border border-[#7C3AED] hover:bg-[#F5F3FF] text-[#7C3AED] font-bold text-xs rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-40 select-none"
-          >
-            Save Draft
-          </button>
-
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
           <button
             type="submit"
             disabled={isSubmitting}

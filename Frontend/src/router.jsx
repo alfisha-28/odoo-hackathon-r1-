@@ -23,6 +23,21 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+function AdminRoute({ children }) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (!user?.roles?.includes('ADMIN')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -58,7 +73,11 @@ const router = createBrowserRouter([
       },
       {
         path: '/organization',
-        element: <OrganizationSetupPage />,
+        element: (
+          <AdminRoute>
+            <OrganizationSetupPage />
+          </AdminRoute>
+        ),
       },
       {
         path: '/bookings',

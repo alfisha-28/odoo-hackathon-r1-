@@ -3,21 +3,17 @@ import { useForm } from 'react-hook-form';
 import FormSelect from '../../assets/components/FormSelect';
 import FormTextarea from '../../assets/components/FormTextarea';
 import DatePicker from '../../assets/components/DatePicker';
-import UploadArea from './UploadArea';
 import TimeSlotPicker from './TimeSlotPicker';
 import ResourceAvailability from './ResourceAvailability';
 
 import bookingData from '../data/data.json';
 
-export default function BookingForm({ prefilledType, onCancel, onSaveDraft, onSubmitSuccess }) {
-  const [selectedFile, setSelectedFile] = useState(null);
-
+export default function BookingForm({ prefilledType, onCancel, onSubmitSuccess }) {
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -30,8 +26,6 @@ export default function BookingForm({ prefilledType, onCancel, onSaveDraft, onSu
       startTime: '',
       endTime: '',
       purpose: '',
-      priority: '',
-      notes: '',
     },
   });
 
@@ -108,49 +102,8 @@ export default function BookingForm({ prefilledType, onCancel, onSaveDraft, onSu
     };
   }, [resourceId]);
 
-  const handleSaveDraftClick = async () => {
-    // Save draft log - optional validation, but we can trigger it
-    const values = getValues();
-    onSaveDraft({ ...values, attachment: selectedFile });
-  };
-
   const handleFormSubmit = (data) => {
-    // Find Resource Meta
-    const resMeta = bookingData.resources.find((r) => r.id === data.resourceId);
-    // Find Employee/Dept details
-    let empDetails = {
-      name: 'John Doe',
-      department: 'Operations & IT',
-      avatar: '/avatars/john.png',
-    };
-
-    if (data.bookingFor === 'Employee') {
-      const emp = bookingData.employees.find((e) => e.id === data.employeeId);
-      if (emp) {
-        empDetails = {
-          name: emp.name,
-          department: emp.department,
-          avatar: emp.avatar,
-        };
-      }
-    } else if (data.bookingFor === 'Department') {
-      empDetails = {
-        name: `${data.departmentName} Group`,
-        department: data.departmentName,
-        avatar: '',
-      };
-    }
-
-    const submission = {
-      ...data,
-      resource: resMeta
-        ? { id: resMeta.id, name: resMeta.name, type: resMeta.type, image: resMeta.image, location: resMeta.location }
-        : null,
-      employee: empDetails,
-      attachment: selectedFile,
-    };
-
-    onSubmitSuccess(submission);
+    onSubmitSuccess(data);
   };
 
   return (
@@ -274,12 +227,12 @@ export default function BookingForm({ prefilledType, onCancel, onSaveDraft, onSu
 
       <div className="border-t border-[#F3F4F6] w-full" />
 
-      {/* Section 3: Purpose & Priority */}
+      {/* Section 3: Purpose */}
       <div className="flex flex-col gap-4">
         <h3 className="text-xs font-black text-[#111827] uppercase tracking-wider select-none">
-          3. Details & Urgency
+          3. Details
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <FormTextarea
             label="Purpose"
             placeholder="Reason for booking this resource..."
@@ -288,34 +241,6 @@ export default function BookingForm({ prefilledType, onCancel, onSaveDraft, onSu
             error={errors.purpose}
             {...register('purpose', { required: 'Purpose is required' })}
           />
-
-          <FormSelect
-            label="Priority Level"
-            placeholder="Select Priority"
-            required
-            options={['Low', 'Medium', 'High', 'Urgent']}
-            error={errors.priority}
-            {...register('priority', { required: 'Priority is required' })}
-          />
-        </div>
-      </div>
-
-      <div className="border-t border-[#F3F4F6] w-full" />
-
-      {/* Section 4: Notes and Attachments */}
-      <div className="flex flex-col gap-4">
-        <h3 className="text-xs font-black text-[#111827] uppercase tracking-wider select-none">
-          4. Documentation (Optional)
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
-          <FormTextarea
-            label="Internal Notes"
-            placeholder="Add any additional notes..."
-            maxLength={200}
-            {...register('notes')}
-          />
-
-          <UploadArea label="Attachment" onFileSelect={setSelectedFile} />
         </div>
       </div>
 
@@ -329,15 +254,7 @@ export default function BookingForm({ prefilledType, onCancel, onSaveDraft, onSu
           Cancel
         </button>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-          <button
-            type="button"
-            onClick={handleSaveDraftClick}
-            className="w-full sm:w-auto h-11 px-5 border border-[#7C3AED] hover:bg-[#F5F3FF] text-[#7C3AED] font-bold text-xs rounded-xl transition-all duration-200 cursor-pointer select-none"
-          >
-            Save Draft
-          </button>
-
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
           <button
             type="submit"
             disabled={isSubmitting}

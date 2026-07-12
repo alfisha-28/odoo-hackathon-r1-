@@ -75,7 +75,7 @@ export default function AssetDistributionChart({
                 <span className="text-[#475569]">{item.name}</span>
               </div>
               <span className="text-[#111827] font-bold text-right pl-2">
-                {item.value} <span className="text-[#9CA3AF] font-medium text-[10px]">({item.percentage})</span>
+                {item.value} <span className="text-[#9CA3AF] font-medium text-[10px]">({item.percentage}{String(item.percentage).endsWith('%') ? '' : '%'})</span>
               </span>
             </div>
           ))}

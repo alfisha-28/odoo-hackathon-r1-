@@ -14,11 +14,54 @@ import AllocationForm from '../components/AllocationForm';
 import allocationData from '../data/data.json';
 import { allocationService } from '../services/allocationService';
 
+const getAssetImage = (name = '') => {
+  const lower = name.toLowerCase();
+  if (lower.includes('laptop') || lower.includes('macbook') || lower.includes('xps') || lower.includes('thinkpad')) return 'Laptop';
+  if (lower.includes('printer') || lower.includes('laserjet') || lower.includes('canon')) return 'Printer';
+  if (lower.includes('projector') || lower.includes('epson') || lower.includes('video')) return 'Projector';
+  if (lower.includes('room') || lower.includes('hall') || lower.includes('office') || lower.includes('drive')) return 'Room';
+  if (lower.includes('phone') || lower.includes('mobile') || lower.includes('iphone') || lower.includes('android')) return 'Mobile';
+  return '';
+};
+
+const getInitials = (name = '') => {
+  if (!name) return '';
+  return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+};
+
 export default function AllocationPage() {
   const [allocationsList, setAllocationsList] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // KPIs State
+  const [kpis, setKpis] = useState({
+    total: 0,
+    active: 0,
+    pending: 0,
+    returned: 0
+  });
+
+  const fetchKPIs = async () => {
+    try {
+      const [totalRes, activeRes, pendingRes, returnedRes] = await Promise.all([
+        allocationService.getAllocations({ limit: 1 }),
+        allocationService.getAllocations({ status: 'ACTIVE', limit: 1 }),
+        allocationService.getTransfers({ status: 'REQUESTED', limit: 1 }),
+        allocationService.getAllocations({ status: 'RETURNED', limit: 1 })
+      ]);
+
+      setKpis({
+        total: totalRes?.meta?.total || totalRes?.total || 0,
+        active: activeRes?.meta?.total || activeRes?.total || 0,
+        pending: pendingRes?.meta?.total || pendingRes?.total || 0,
+        returned: returnedRes?.meta?.total || returnedRes?.total || 0
+      });
+    } catch (err) {
+      console.error("Failed to load backend KPIs for allocation page:", err);
+    }
+  };
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,8 +107,61 @@ export default function AllocationPage() {
           limit: itemsPerPage
         });
       }
-      setAllocationsList(data.allocations || data.transfers || data.data || []);
-      setTotalItems(data.total || 0);
+
+      const rawList = data?.allocations || data?.transfers || data?.data || [];
+      const mappedList = rawList.map(item => {
+        const isTransfer = item.requestedBy !== undefined;
+        if (isTransfer) {
+          return {
+            id: item.id,
+            rawItem: item,
+            isTransfer: true,
+            asset: {
+              name: item.asset?.name || 'Unknown Asset',
+              code: item.asset?.assetTag || 'N/A',
+              image: getAssetImage(item.asset?.name)
+            },
+            employee: {
+              name: item.requestedBy?.name || 'Unknown User',
+              role: 'Requester',
+              avatar: getInitials(item.requestedBy?.name)
+            },
+            department: item.requestedToDepartment || 'N/A',
+            allocatedOn: item.createdAt,
+            dueDate: null,
+            status: item.status
+          };
+        } else {
+          const empName = item.allocatedToEmployee?.name || '';
+          const deptName = item.allocatedToDepartment?.name || '';
+          return {
+            id: item.id,
+            rawItem: item,
+            isTransfer: false,
+            asset: {
+              name: item.asset?.name || 'Unknown Asset',
+              code: item.asset?.assetTag || 'N/A',
+              image: getAssetImage(item.asset?.name)
+            },
+            employee: item.allocatedToEmployee ? {
+              name: empName,
+              role: 'Employee',
+              avatar: getInitials(empName)
+            } : {
+              name: deptName || 'Department-wide',
+              role: 'Department',
+              avatar: getInitials(deptName)
+            },
+            department: deptName || 'Personal',
+            allocatedOn: item.allocationDate,
+            dueDate: item.expectedReturnDate,
+            status: item.status
+          };
+        }
+      });
+
+      setAllocationsList(mappedList);
+      setTotalItems(data?.meta?.total || data?.total || 0);
     } catch (err) {
       console.error('Failed to fetch allocations', err);
     } finally {
@@ -75,6 +171,7 @@ export default function AllocationPage() {
 
   useEffect(() => {
     fetchAllocations();
+    fetchKPIs();
   }, [activeTab, searchQuery, selectedStatus, selectedDepartment, startDateFilter, endDateFilter, currentPage]);
 
   const handleTabChange = (tabName) => {
@@ -101,6 +198,7 @@ export default function AllocationPage() {
         await allocationService.processTransfer(id, action.toUpperCase(), reason);
         alert(`Transfer ${action.toUpperCase()} successfully!`);
         fetchAllocations();
+        fetchKPIs();
       } catch (err) {
         console.error(err);
         alert("Failed to process transfer.");
@@ -115,6 +213,7 @@ export default function AllocationPage() {
             await allocationService.returnAsset(id, { checkInCondition: condition, checkInNotes: notes });
             alert("Asset returned successfully!");
             fetchAllocations();
+            fetchKPIs();
           } catch (e) {
             console.error(e);
             alert("Failed to return asset.");
@@ -132,6 +231,7 @@ export default function AllocationPage() {
             });
             alert("Transfer requested successfully!");
             fetchAllocations();
+            fetchKPIs();
           } catch (e) {
             console.error(e);
             alert("Failed to request transfer.");
@@ -147,23 +247,57 @@ export default function AllocationPage() {
       await allocationService.allocateAsset({
         assetId: formData.assetId,
         assigneeId: formData.employeeId,
-        departmentId: formData.departmentName, // Assuming the backend maps this appropriately or you need a department ID
+        departmentId: formData.departmentName,
         expectedReturnDate: formData.dueDate,
-        notes: formData.notes
       });
       setIsModalOpen(false);
       alert('Asset successfully allocated!');
       fetchAllocations();
+      fetchKPIs();
     } catch (err) {
       console.error(err);
       alert('Failed to allocate asset.');
     }
   };
 
-  const handleSaveDraft = (draftData) => {
-    console.log('Save Draft Allocation Form Data:', draftData);
-    alert('Allocation successfully saved as draft! Form values logged to console.');
-  };
+  const statsCardsData = React.useMemo(() => {
+    return [
+      {
+        id: 'stat-total',
+        title: 'Total Allocations',
+        value: kpis.total,
+        subtitle: 'All time',
+        icon: 'PackageCheck',
+        color: 'indigo'
+      },
+      {
+        id: 'stat-active',
+        title: 'Active Allocations',
+        value: kpis.active,
+        subtitle: 'Currently active',
+        icon: 'ArrowLeftRight',
+        color: 'emerald'
+      },
+      {
+        id: 'stat-pending',
+        title: 'Pending Requests',
+        value: kpis.pending,
+        subtitle: 'Awaiting approval',
+        icon: 'Clock3',
+        color: 'orange'
+      },
+      {
+        id: 'stat-returned',
+        title: 'Returned Assets',
+        value: kpis.returned,
+        subtitle: 'All returned',
+        icon: 'History',
+        color: 'blue'
+      }
+    ];
+  }, [kpis]);
+
+
 
   return (
     <>
@@ -192,7 +326,7 @@ export default function AllocationPage() {
 
       {/* Statistics Cards grid */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-        {allocationData.stats.map((stat) => (
+        {statsCardsData.map((stat) => (
           <StatsCard
             key={stat.id}
             title={stat.title}
@@ -294,7 +428,6 @@ export default function AllocationPage() {
       <AllocationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <AllocationForm
           onCancel={() => setIsModalOpen(false)}
-          onSaveDraft={handleSaveDraft}
           onSubmitSuccess={handleAllocateSubmit}
         />
       </AllocationModal>
