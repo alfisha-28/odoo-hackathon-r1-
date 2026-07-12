@@ -12,11 +12,6 @@ const login = asyncHandler(async (req, res) => {
   ApiResponse.success(res, { token, employee }, 'Login successful');
 });
 
-/**
- * Logout — stateless JWT; no server-side invalidation.
- * KNOWN LIMITATION: Tokens remain valid until expiry. A token blacklist
- * (e.g. Redis) is deferred to Phase 2 scope.
- */
 const logout = asyncHandler(async (req, res) => {
   ApiResponse.success(res, null, 'Logged out successfully. Please discard your token client-side.');
 });

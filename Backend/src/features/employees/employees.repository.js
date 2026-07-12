@@ -42,7 +42,6 @@ const updateEmployee = (id, { status, passwordHash }) => {
 };
 
 const replaceEmployeeRoles = async (employeeId, roles, assignedById) => {
-  // Delete all existing roles then create the new set in a transaction
   return prisma.$transaction([
     prisma.employeeRole.deleteMany({ where: { employeeId } }),
     ...roles.map((role) =>

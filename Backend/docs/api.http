@@ -1,5 +1,5 @@
-### AssetFlow Phase 1 — API Verification Sequence
-### Use with VS Code REST Client extension or copy curl commands below
+### AssetFlow Phase 1 & 2 — API Verification Sequence
+### Use with VS Code REST Client extension
 
 @baseUrl = http://localhost:3000/api
 @adminEmail = admin@assetflow.io
@@ -119,3 +119,119 @@ Authorization: Bearer {{adminToken}}
 ### ─────────────────────────────────────────────
 POST {{baseUrl}}/auth/logout
 Authorization: Bearer {{employeeToken}}
+
+###
+### ═════════════════════════════════════════════
+### PHASE 2 — Asset Registry Verification
+### ═════════════════════════════════════════════
+
+### ─────────────────────────────────────────────
+### P2-1. Admin login (reuse seeded admin)
+### ─────────────────────────────────────────────
+# @name p2AdminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@assetflow.io",
+  "password": "Admin@1234"
+}
+
+@p2AdminToken = {{p2AdminLogin.response.body.data.token}}
+
+### ─────────────────────────────────────────────
+### P2-2. GET categories (need categoryId for asset creation)
+### ─────────────────────────────────────────────
+# @name getCategories
+GET {{baseUrl}}/categories
+Authorization: Bearer {{p2AdminToken}}
+
+### ─────────────────────────────────────────────
+### P2-3. Register a new asset as Admin
+###       Seed already created AF-0001 to AF-0005,
+###       so this should auto-generate AF-0006
+### ─────────────────────────────────────────────
+# @name registerAsset
+POST {{baseUrl}}/assets
+Content-Type: application/json
+Authorization: Bearer {{p2AdminToken}}
+
+{
+  "name": "HP EliteDesk Desktop",
+  "categoryId": "<PASTE_LAPTOP_CATEGORY_ID_FROM_P2-2>",
+  "serialNumber": "SN-HP-ELITE-006",
+  "acquisitionDate": "2026-07-12T00:00:00Z",
+  "acquisitionCost": 899.00,
+  "condition": "NEW",
+  "location": "Operations Room",
+  "isBookable": false,
+  "photoUrls": []
+}
+
+@newAssetId = {{registerAsset.response.body.data.asset.id}}
+
+### ─────────────────────────────────────────────
+### P2-4. Search for the newly registered asset
+### ─────────────────────────────────────────────
+GET {{baseUrl}}/assets?search=HP+EliteDesk
+Authorization: Bearer {{p2AdminToken}}
+
+### ─────────────────────────────────────────────
+### P2-5. GET full asset detail — confirm statusHistory
+###       has "Asset registered" entry
+### ─────────────────────────────────────────────
+GET {{baseUrl}}/assets/{{newAssetId}}
+Authorization: Bearer {{p2AdminToken}}
+
+### ─────────────────────────────────────────────
+### P2-6. PATCH asset — update location and condition
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/assets/{{newAssetId}}
+Content-Type: application/json
+Authorization: Bearer {{p2AdminToken}}
+
+{
+  "location": "Engineering Lab",
+  "condition": "GOOD"
+}
+
+### ─────────────────────────────────────────────
+### P2-7. PATCH status to ALLOCATED directly — should be rejected 400
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/assets/{{newAssetId}}
+Content-Type: application/json
+Authorization: Bearer {{p2AdminToken}}
+
+{
+  "status": "ALLOCATED"
+}
+
+### ─────────────────────────────────────────────
+### P2-8. POST /api/assets as plain EMPLOYEE — should get 403
+###       Use the employee token from Phase 1 login
+### ─────────────────────────────────────────────
+POST {{baseUrl}}/assets
+Content-Type: application/json
+Authorization: Bearer {{employeeToken}}
+
+{
+  "name": "Unauthorized Asset",
+  "categoryId": "<ANY_CATEGORY_ID>"
+}
+
+### ─────────────────────────────────────────────
+### P2-9. GET paginated asset list with filters
+### ─────────────────────────────────────────────
+GET {{baseUrl}}/assets?status=AVAILABLE&page=1&limit=5
+Authorization: Bearer {{p2AdminToken}}
+
+### ─────────────────────────────────────────────
+### P2-10. PATCH status to RETIRED (allowed via this route)
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/assets/{{newAssetId}}
+Content-Type: application/json
+Authorization: Bearer {{p2AdminToken}}
+
+{
+  "status": "RETIRED"
+}

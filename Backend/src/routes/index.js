@@ -5,6 +5,7 @@ const authRouter = require('../features/auth/auth.routes');
 const departmentsRouter = require('../features/departments/departments.routes');
 const categoriesRouter = require('../features/categories/categories.routes');
 const employeesRouter = require('../features/employees/employees.routes');
+const assetsRouter = require('../features/assets/assets.routes');
 
 const router = express.Router();
 
@@ -23,5 +24,8 @@ router.use('/auth', authRouter);
 router.use('/departments', departmentsRouter);
 router.use('/categories', categoriesRouter);
 router.use('/employees', employeesRouter);
+
+// Phase 2 feature routes
+router.use('/assets', assetsRouter);
 
 module.exports = router;

@@ -4,17 +4,12 @@ const { findEmployeeByEmail, findFirstOrganization, createEmployee } = require('
 const { mapEmployee } = require('./auth.mapper');
 const ApiError = require('../../lib/ApiError');
 
-/**
- * Signup — creates new Employee with hashed password and EMPLOYEE role.
- * Does NOT return a token; caller must explicitly login.
- */
 const signup = async ({ name, email, password }) => {
   const existing = await findEmployeeByEmail(email);
   if (existing) {
     throw ApiError.conflict('An account with this email already exists');
   }
 
-  // Use the first (and only) organization — single-tenant for this hackathon scope
   const org = await findFirstOrganization();
   if (!org) {
     throw ApiError.badRequest('No organization found. Run the seed script first.');
@@ -26,9 +21,6 @@ const signup = async ({ name, email, password }) => {
   return mapEmployee(employee);
 };
 
-/**
- * Login — verifies credentials and issues a JWT.
- */
 const login = async ({ email, password }) => {
   const employee = await findEmployeeByEmail(email);
   if (!employee) {

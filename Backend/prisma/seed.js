@@ -1,8 +1,6 @@
 /**
  * prisma/seed.js
- * Seeds one Organization, one Admin employee, departments, and categories.
- * Run with: npx prisma db seed
- * Or directly: node prisma/seed.js
+ * Run: node prisma/seed.js
  */
 
 const { PrismaClient } = require('@prisma/client');
@@ -16,7 +14,6 @@ const ADMIN_PASSWORD = 'Admin@1234';
 async function main() {
   console.log('🌱  Seeding database...');
 
-  // --- Organization ---
   let org = await prisma.organization.findFirst();
   if (!org) {
     org = await prisma.organization.create({
@@ -27,7 +24,6 @@ async function main() {
     console.log(`ℹ️   Organization already exists: ${org.name}`);
   }
 
-  // --- Admin Employee ---
   let admin = await prisma.employee.findUnique({ where: { email: ADMIN_EMAIL } });
   if (!admin) {
     const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
@@ -47,7 +43,6 @@ async function main() {
     console.log(`ℹ️   Admin already exists: ${admin.email}`);
   }
 
-  // --- Departments ---
   const deptData = [
     { name: 'Engineering', status: 'ACTIVE' },
     { name: 'Operations', status: 'ACTIVE' },
@@ -64,7 +59,6 @@ async function main() {
     }
   }
 
-  // --- Asset Categories ---
   const categoryData = [
     { name: 'Laptops', description: 'All portable computers', customFields: { warrantyPeriodMonths: 24 } },
     { name: 'Monitors', description: 'Display screens and monitors', customFields: { warrantyPeriodMonths: 36 } },
@@ -79,6 +73,102 @@ async function main() {
       console.log(`✅  Category created: ${c.name}`);
     } else {
       console.log(`ℹ️   Category already exists: ${c.name}`);
+    }
+  }
+
+  const laptopCat = await prisma.assetCategory.findFirst({ where: { name: 'Laptops', organizationId: org.id } });
+  const monitorCat = await prisma.assetCategory.findFirst({ where: { name: 'Monitors', organizationId: org.id } });
+  const furnitureCat = await prisma.assetCategory.findFirst({ where: { name: 'Furniture', organizationId: org.id } });
+  const vehicleCat = await prisma.assetCategory.findFirst({ where: { name: 'Vehicles', organizationId: org.id } });
+
+  const sampleAssets = [
+    {
+      assetTag: 'AF-0001',
+      name: 'Dell XPS 15 Laptop',
+      categoryId: laptopCat?.id,
+      status: 'AVAILABLE',
+      condition: 'GOOD',
+      serialNumber: 'SN-DXPS-001',
+      location: 'Engineering Office',
+      isBookable: false,
+      acquisitionDate: new Date('2024-01-15'),
+      acquisitionCost: 1299.99,
+    },
+    {
+      assetTag: 'AF-0002',
+      name: 'MacBook Pro 14"',
+      categoryId: laptopCat?.id,
+      status: 'AVAILABLE',
+      condition: 'NEW',
+      serialNumber: 'SN-MBP-002',
+      location: 'IT Storage',
+      isBookable: false,
+      acquisitionDate: new Date('2024-03-10'),
+      acquisitionCost: 1999.00,
+    },
+    {
+      assetTag: 'AF-0003',
+      name: 'LG UltraWide 34" Monitor',
+      categoryId: monitorCat?.id,
+      status: 'AVAILABLE',
+      condition: 'GOOD',
+      serialNumber: 'SN-LG34-003',
+      location: 'Engineering Office',
+      isBookable: false,
+      acquisitionDate: new Date('2023-11-20'),
+      acquisitionCost: 549.00,
+    },
+    {
+      assetTag: 'AF-0004',
+      name: 'Ergonomic Office Chair',
+      categoryId: furnitureCat?.id,
+      status: 'AVAILABLE',
+      condition: 'FAIR',
+      serialNumber: null,
+      location: 'HR Office',
+      isBookable: false,
+      acquisitionDate: new Date('2022-06-01'),
+      acquisitionCost: 350.00,
+    },
+    {
+      assetTag: 'AF-0005',
+      name: 'Toyota Innova (Company Vehicle)',
+      categoryId: vehicleCat?.id,
+      status: 'RETIRED',
+      condition: 'DAMAGED',
+      serialNumber: 'VIN-TYT-005',
+      location: 'Basement Parking',
+      isBookable: false,
+      acquisitionDate: new Date('2019-04-01'),
+      acquisitionCost: 22000.00,
+    },
+  ];
+
+  for (const a of sampleAssets) {
+    if (!a.categoryId) {
+      console.log(`⚠️   Skipping asset "${a.name}" — category not found`);
+      continue;
+    }
+    const existing = await prisma.asset.findUnique({ where: { assetTag: a.assetTag } });
+    if (!existing) {
+      await prisma.asset.create({
+        data: {
+          ...a,
+          organizationId: org.id,
+          registeredById: admin.id,
+          statusHistory: {
+            create: [{
+              fromStatus: null,
+              toStatus: a.status,
+              reason: 'Asset registered (seed)',
+              changedById: admin.id,
+            }],
+          },
+        },
+      });
+      console.log(`✅  Asset created: ${a.assetTag} — ${a.name}`);
+    } else {
+      console.log(`ℹ️   Asset already exists: ${a.assetTag}`);
     }
   }
 

@@ -2,9 +2,6 @@ const { verifyToken } = require('../common/utils/jwt.util');
 const ApiError = require('../lib/ApiError');
 const prisma = require('../config/prisma');
 
-/**
- * Verifies the JWT bearer token and attaches req.employee with roles array.
- */
 const authenticate = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
@@ -15,7 +12,6 @@ const authenticate = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const payload = verifyToken(token);
 
-    // Fetch fresh employee + roles from DB so revoked/inactive accounts are caught
     const employee = await prisma.employee.findUnique({
       where: { id: payload.employeeId },
       include: { roles: { select: { role: true } } },
