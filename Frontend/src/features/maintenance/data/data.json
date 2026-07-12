@@ -1,0 +1,200 @@
+{
+  "stats": [
+    {
+      "id": "stat-total",
+      "title": "Total Tickets",
+      "value": 36,
+      "subtitle": "All time",
+      "icon": "Wrench",
+      "color": "indigo"
+    },
+    {
+      "id": "stat-open",
+      "title": "Open Tickets",
+      "value": 16,
+      "subtitle": "Needs attention",
+      "icon": "AlertTriangle",
+      "color": "orange"
+    },
+    {
+      "id": "stat-progress",
+      "title": "In Progress",
+      "value": 10,
+      "subtitle": "Being resolved",
+      "icon": "Clock3",
+      "color": "blue"
+    },
+    {
+      "id": "stat-resolved",
+      "title": "Resolved",
+      "value": 8,
+      "subtitle": "This month",
+      "icon": "CheckCircle2",
+      "color": "green"
+    }
+  ],
+  "tabs": ["All Tickets", "Open", "In Progress", "Resolved", "Closed"],
+  "priorities": ["Low", "Medium", "High", "Critical"],
+  "statuses": ["Open", "In Progress", "Resolved", "Closed", "Cancelled"],
+  "categories": [
+    "Hardware Failure",
+    "Performance Issue",
+    "Wear & Tear",
+    "Software Issue",
+    "Other"
+  ],
+  "technicians": [
+    "Rahul Patel",
+    "Sarah Johnson",
+    "Michael Chang",
+    "Neha Gupta"
+  ],
+  "tickets": [
+    {
+      "id": "MT-2025-0036",
+      "asset": {
+        "name": "Dell XPS 13",
+        "code": "AF-0001",
+        "image": "/assets/laptop.png"
+      },
+      "issue": "Laptop overheating and shutting down",
+      "priority": "High",
+      "reportedBy": {
+        "name": "Priya Shah",
+        "department": "IT Department",
+        "avatar": "/avatars/priya.png"
+      },
+      "assignedTechnician": "Rahul Patel",
+      "status": "In Progress",
+      "reportedDate": "2025-05-10",
+      "dueDate": "2025-05-15"
+    },
+    {
+      "id": "MT-2025-0035",
+      "asset": {
+        "name": "HP LaserJet Pro",
+        "code": "PR-0021",
+        "image": "/assets/printer.png"
+      },
+      "issue": "Paper jam error in tray 2",
+      "priority": "Medium",
+      "reportedBy": {
+        "name": "Rohan Mehta",
+        "department": "Finance Department",
+        "avatar": "/avatars/rohan.png"
+      },
+      "assignedTechnician": "Neha Gupta",
+      "status": "Open",
+      "reportedDate": "2025-05-11",
+      "dueDate": "2025-05-19"
+    },
+    {
+      "id": "MT-2025-0034",
+      "asset": {
+        "name": "LG AC - 1.5 Ton",
+        "code": "AC-0012",
+        "image": "/assets/ac.png"
+      },
+      "issue": "AC not cooling properly",
+      "priority": "High",
+      "reportedBy": {
+        "name": "Ankit Verma",
+        "department": "Admin Department",
+        "avatar": "/avatars/ankit.png"
+      },
+      "assignedTechnician": "Michael Chang",
+      "status": "In Progress",
+      "reportedDate": "2025-05-12",
+      "dueDate": "2025-05-17"
+    },
+    {
+      "id": "MT-2025-0033",
+      "asset": {
+        "name": "Meeting Room A",
+        "code": "RM-0003",
+        "image": "/assets/meeting_room.png"
+      },
+      "issue": "Projector not turning on",
+      "priority": "Low",
+      "reportedBy": {
+        "name": "Neha Patil",
+        "department": "Marketing Department",
+        "avatar": "/avatars/neha.png"
+      },
+      "assignedTechnician": "Sarah Johnson",
+      "status": "Open",
+      "reportedDate": "2025-05-13",
+      "dueDate": "2025-05-20"
+    },
+    {
+      "id": "MT-2025-0032",
+      "asset": {
+        "name": "Generator G-34",
+        "code": "EG-0009",
+        "image": "/assets/generator.png"
+      },
+      "issue": "Strange noise during operation",
+      "priority": "High",
+      "reportedBy": {
+        "name": "Sanjay Kumar",
+        "department": "Facilities Department",
+        "avatar": "/avatars/sanjay.png"
+      },
+      "assignedTechnician": "Rahul Patel",
+      "status": "Open",
+      "reportedDate": "2025-05-14",
+      "dueDate": "2025-05-16"
+    },
+    {
+      "id": "MT-2025-0031",
+      "asset": {
+        "name": "MacBook Pro 16\"",
+        "code": "AF-0089",
+        "image": "/assets/laptop.png"
+      },
+      "issue": "Keyboard keys sticking under spacebar",
+      "priority": "Critical",
+      "reportedBy": {
+        "name": "Rahul Verma",
+        "department": "Engineering Department",
+        "avatar": "/avatars/rahul.png"
+      },
+      "assignedTechnician": "Neha Gupta",
+      "status": "Resolved",
+      "reportedDate": "2025-05-09",
+      "dueDate": "2025-05-12"
+    },
+    {
+      "id": "MT-2025-0030",
+      "asset": {
+        "name": "Conference Desk",
+        "code": "AF-0120",
+        "image": "/assets/desk.png"
+      },
+      "issue": "Table leg loose and wobbling",
+      "priority": "Low",
+      "reportedBy": {
+        "name": "Priya Shah",
+        "department": "IT Department",
+        "avatar": "/avatars/priya.png"
+      },
+      "assignedTechnician": "Sarah Johnson",
+      "status": "Closed",
+      "reportedDate": "2025-05-05",
+      "dueDate": "2025-05-10"
+    }
+  ],
+  "overview": [
+    { "name": "Open", "value": 16, "percentage": 44, "color": "#F59E0B" },
+    { "name": "In Progress", "value": 10, "percentage": 28, "color": "#3B82F6" },
+    { "name": "Resolved", "value": 8, "percentage": 22, "color": "#22C55E" },
+    { "name": "Overdue", "value": 2, "percentage": 6, "color": "#EF4444" }
+  ],
+  "issueCategories": [
+    { "name": "Hardware Failure", "value": 14 },
+    { "name": "Performance Issue", "value": 9 },
+    { "name": "Wear & Tear", "value": 6 },
+    { "name": "Software Issue", "value": 4 },
+    { "name": "Other", "value": 3 }
+  ]
+}

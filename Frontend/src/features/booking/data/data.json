@@ -1,0 +1,319 @@
+{
+  "stats": [
+    {
+      "id": "stat-upcoming",
+      "title": "Upcoming Bookings",
+      "value": 24,
+      "subtitle": "Next 7 Days",
+      "icon": "CalendarDays",
+      "color": "indigo"
+    },
+    {
+      "id": "stat-active",
+      "title": "Active Bookings",
+      "value": 12,
+      "subtitle": "Currently ongoing",
+      "icon": "CalendarCheck",
+      "color": "emerald"
+    },
+    {
+      "id": "stat-pending",
+      "title": "Pending Requests",
+      "value": 7,
+      "subtitle": "Awaiting approval",
+      "icon": "Clock3",
+      "color": "orange"
+    },
+    {
+      "id": "stat-overdue",
+      "title": "Overdue Bookings",
+      "value": 3,
+      "subtitle": "Past due date",
+      "icon": "AlertCircle",
+      "color": "red"
+    }
+  ],
+  "tabs": [
+    "All Bookings",
+    "My Bookings",
+    "Pending Approval",
+    "Approved",
+    "Cancelled",
+    "Completed"
+  ],
+  "resourceTypes": [
+    "Laptop",
+    "Conference Room",
+    "Equipment",
+    "Vehicle"
+  ],
+  "resources": [
+    {
+      "id": "res-1",
+      "name": "Dell XPS 13",
+      "type": "Laptop",
+      "image": "/assets/laptop.png",
+      "location": "IT Lab"
+    },
+    {
+      "id": "res-2",
+      "name": "Meeting Room A",
+      "type": "Conference Room",
+      "image": "/assets/meeting_room.png",
+      "location": "HQ - Floor 1"
+    },
+    {
+      "id": "res-3",
+      "name": "Epson Projector",
+      "type": "Equipment",
+      "image": "/assets/projector.png",
+      "location": "HQ - Floor 2"
+    },
+    {
+      "id": "res-4",
+      "name": "Canon DSLR Camera",
+      "type": "Equipment",
+      "image": "/assets/camera.png",
+      "location": "Marketing Room"
+    },
+    {
+      "id": "res-5",
+      "name": "Company Car - HR",
+      "type": "Vehicle",
+      "image": "/assets/car.png",
+      "location": "Garage"
+    }
+  ],
+  "departments": [
+    "IT Department",
+    "Finance Department",
+    "HR Department",
+    "Marketing Department",
+    "Design Department",
+    "Sales Department"
+  ],
+  "employees": [
+    { "id": "emp-1", "name": "Priya Shah", "department": "IT Department", "avatar": "/avatars/priya.png" },
+    { "id": "emp-2", "name": "Rohan Mehta", "department": "Finance Department", "avatar": "/avatars/rohan.png" },
+    { "id": "emp-3", "name": "Neha Patil", "department": "Marketing Department", "avatar": "/avatars/neha.png" },
+    { "id": "emp-4", "name": "Ankit Verma", "department": "Design Department", "avatar": "/avatars/ankit.png" },
+    { "id": "emp-5", "name": "Sanjay Kumar", "department": "HR Department", "avatar": "/avatars/sanjay.png" }
+  ],
+  "bookings": [
+    {
+      "id": "BK-2025-0056",
+      "resource": {
+        "id": "res-1",
+        "name": "Dell XPS 13",
+        "type": "Laptop",
+        "image": "/assets/laptop.png",
+        "location": "IT Lab"
+      },
+      "employee": {
+        "name": "Priya Shah",
+        "department": "IT Department",
+        "avatar": "/avatars/priya.png"
+      },
+      "date": "2025-05-15",
+      "startTime": "10:00",
+      "endTime": "13:00",
+      "purpose": "Client Presentation",
+      "status": "Approved",
+      "priority": "High",
+      "notes": "Need charger and HDMI adapter."
+    },
+    {
+      "id": "BK-2025-0055",
+      "resource": {
+        "id": "res-2",
+        "name": "Meeting Room A",
+        "type": "Conference Room",
+        "image": "/assets/meeting_room.png",
+        "location": "HQ - Floor 1"
+      },
+      "employee": {
+        "name": "Rohan Mehta",
+        "department": "Finance Department",
+        "avatar": "/avatars/rohan.png"
+      },
+      "date": "2025-05-15",
+      "startTime": "14:00",
+      "endTime": "16:30",
+      "purpose": "Team Meeting",
+      "status": "Approved",
+      "priority": "Medium",
+      "notes": "Discuss Q2 financials."
+    },
+    {
+      "id": "BK-2025-0054",
+      "resource": {
+        "id": "res-3",
+        "name": "Epson Projector",
+        "type": "Equipment",
+        "image": "/assets/projector.png",
+        "location": "HQ - Floor 2"
+      },
+      "employee": {
+        "name": "Ankit Verma",
+        "department": "Design Department",
+        "avatar": "/avatars/ankit.png"
+      },
+      "date": "2025-05-16",
+      "startTime": "11:00",
+      "endTime": "12:30",
+      "purpose": "Design Review",
+      "status": "Pending",
+      "priority": "High",
+      "notes": "Reviewing new mobile mocks."
+    },
+    {
+      "id": "BK-2025-0053",
+      "resource": {
+        "id": "res-4",
+        "name": "Canon DSLR Camera",
+        "type": "Equipment",
+        "image": "/assets/camera.png",
+        "location": "Marketing Room"
+      },
+      "employee": {
+        "name": "Neha Patil",
+        "department": "Marketing Department",
+        "avatar": "/avatars/neha.png"
+      },
+      "date": "2025-05-16",
+      "startTime": "15:00",
+      "endTime": "18:00",
+      "purpose": "Product Photoshoot",
+      "status": "Approved",
+      "priority": "Low",
+      "notes": "Need fully charged battery."
+    },
+    {
+      "id": "BK-2025-0052",
+      "resource": {
+        "id": "res-5",
+        "name": "Company Car - HR",
+        "type": "Vehicle",
+        "image": "/assets/car.png",
+        "location": "Garage"
+      },
+      "employee": {
+        "name": "Sanjay Kumar",
+        "department": "HR Department",
+        "avatar": "/avatars/sanjay.png"
+      },
+      "date": "2025-05-17",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "purpose": "Office Visit",
+      "status": "Completed",
+      "priority": "Medium",
+      "notes": "Travel to local branch office."
+    },
+    {
+      "id": "BK-2025-0051",
+      "resource": {
+        "id": "res-1",
+        "name": "Dell XPS 13",
+        "type": "Laptop",
+        "image": "/assets/laptop.png",
+        "location": "IT Lab"
+      },
+      "employee": {
+        "name": "John Doe",
+        "department": "Operations & IT",
+        "avatar": "/avatars/john.png"
+      },
+      "date": "2025-05-10",
+      "startTime": "09:00",
+      "endTime": "12:00",
+      "purpose": "System Setup",
+      "status": "Overdue",
+      "priority": "Urgent",
+      "notes": "Laptop was not returned on time."
+    },
+    {
+      "id": "BK-2025-0050",
+      "resource": {
+        "id": "res-3",
+        "name": "Epson Projector",
+        "type": "Equipment",
+        "image": "/assets/projector.png",
+        "location": "HQ - Floor 2"
+      },
+      "employee": {
+        "name": "John Doe",
+        "department": "Operations & IT",
+        "avatar": "/avatars/john.png"
+      },
+      "date": "2025-05-12",
+      "startTime": "14:00",
+      "endTime": "16:00",
+      "purpose": "Monthly Review",
+      "status": "Cancelled",
+      "priority": "Medium",
+      "notes": "Meeting rescheduled."
+    },
+    {
+      "id": "BK-2025-0049",
+      "resource": {
+        "id": "res-2",
+        "name": "Meeting Room A",
+        "type": "Conference Room",
+        "image": "/assets/meeting_room.png",
+        "location": "HQ - Floor 1"
+      },
+      "employee": {
+        "name": "Priya Shah",
+        "department": "IT Department",
+        "avatar": "/avatars/priya.png"
+      },
+      "date": "2025-05-14",
+      "startTime": "11:00",
+      "endTime": "13:00",
+      "purpose": "Architecture Sync",
+      "status": "Rejected",
+      "priority": "High",
+      "notes": "Double booked."
+    }
+  ],
+  "availability": [
+    {
+      "resourceId": "res-1",
+      "availableToday": true,
+      "timeSlots": [
+        { "start": "09:00 AM", "end": "12:00 PM" },
+        { "start": "02:00 PM", "end": "06:00 PM" }
+      ]
+    },
+    {
+      "resourceId": "res-2",
+      "availableToday": true,
+      "timeSlots": [
+        { "start": "10:00 AM", "end": "01:00 PM" },
+        { "start": "03:00 PM", "end": "05:00 PM" }
+      ]
+    },
+    {
+      "resourceId": "res-3",
+      "availableToday": true,
+      "timeSlots": [
+        { "start": "09:00 AM", "end": "05:00 PM" }
+      ]
+    },
+    {
+      "resourceId": "res-4",
+      "availableToday": true,
+      "timeSlots": [
+        { "start": "01:00 PM", "end": "04:00 PM" }
+      ]
+    },
+    {
+      "resourceId": "res-5",
+      "availableToday": true,
+      "timeSlots": [
+        { "start": "08:00 AM", "end": "06:00 PM" }
+      ]
+    }
+  ]
+}

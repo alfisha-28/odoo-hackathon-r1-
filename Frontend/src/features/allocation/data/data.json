@@ -1,0 +1,192 @@
+{
+  "stats": [
+    {
+      "id": "stat-total",
+      "title": "Total Allocations",
+      "value": 132,
+      "subtitle": "All time",
+      "icon": "PackageCheck",
+      "color": "indigo"
+    },
+    {
+      "id": "stat-active",
+      "title": "Active Allocations",
+      "value": 98,
+      "subtitle": "Currently active",
+      "icon": "ArrowLeftRight",
+      "color": "emerald"
+    },
+    {
+      "id": "stat-pending",
+      "title": "Pending Requests",
+      "value": 14,
+      "subtitle": "Awaiting approval",
+      "icon": "Clock3",
+      "color": "orange"
+    },
+    {
+      "id": "stat-returned",
+      "title": "Returned Assets",
+      "value": 20,
+      "subtitle": "This month",
+      "icon": "Users",
+      "color": "red"
+    }
+  ],
+  "tabs": [
+    "Active Allocations",
+    "Pending Approvals",
+    "Returned Assets",
+    "Allocation History"
+  ],
+  "statuses": [
+    "Active",
+    "Pending",
+    "Returned",
+    "Completed",
+    "Overdue"
+  ],
+  "departments": [
+    "IT Department",
+    "Finance",
+    "HR Department",
+    "Marketing",
+    "Design",
+    "Sales"
+  ],
+  "employees": [
+    { "id": 1, "name": "Priya Shah", "role": "IT Executive", "avatar": "PS" },
+    { "id": 2, "name": "Rohan Mehta", "role": "Finance Executive", "avatar": "RM" },
+    { "id": 3, "name": "Neha Patil", "role": "HR Manager", "avatar": "NP" },
+    { "id": 4, "name": "Ankit Verma", "role": "UI/UX Designer", "avatar": "AV" },
+    { "id": 5, "name": "Sanjay Kumar", "role": "Operations Lead", "avatar": "SK" }
+  ],
+  "assets": [
+    { "id": 1, "name": "Dell XPS 13", "code": "AF-0001", "image": "Laptop" },
+    { "id": 2, "name": "HP LaserJet Pro", "code": "PR-0021", "image": "Printer" },
+    { "id": 3, "name": "Meeting Room A", "code": "RM-0003", "image": "Room" },
+    { "id": 4, "name": "MacBook Air M2", "code": "AF-0010", "image": "Laptop" },
+    { "id": 5, "name": "Projector Epson", "code": "PR-0012", "image": "Projector" }
+  ],
+  "allocations": [
+    {
+      "id": "ALC-2025-00132",
+      "asset": {
+        "name": "Dell XPS 13",
+        "code": "AF-0001",
+        "image": "Laptop"
+      },
+      "employee": {
+        "name": "Priya Shah",
+        "role": "IT Executive",
+        "avatar": "PS"
+      },
+      "department": "IT Department",
+      "allocatedOn": "2025-01-12",
+      "dueDate": "2026-01-12",
+      "status": "Active"
+    },
+    {
+      "id": "ALC-2025-00131",
+      "asset": {
+        "name": "HP LaserJet Pro",
+        "code": "PR-0021",
+        "image": "Printer"
+      },
+      "employee": {
+        "name": "Rohan Mehta",
+        "role": "Finance Executive",
+        "avatar": "RM"
+      },
+      "department": "Finance",
+      "allocatedOn": "2025-01-10",
+      "dueDate": "2026-01-10",
+      "status": "Active"
+    },
+    {
+      "id": "ALC-2025-00130",
+      "asset": {
+        "name": "Meeting Room A",
+        "code": "RM-0003",
+        "image": "Room"
+      },
+      "employee": {
+        "name": "Marketing Team",
+        "role": "Team",
+        "avatar": "MT"
+      },
+      "department": "Marketing",
+      "allocatedOn": "2025-01-09",
+      "dueDate": "2025-01-09",
+      "status": "Completed"
+    },
+    {
+      "id": "ALC-2025-00129",
+      "asset": {
+        "name": "MacBook Air M2",
+        "code": "AF-0010",
+        "image": "Laptop"
+      },
+      "employee": {
+        "name": "Ankit Verma",
+        "role": "UI/UX Designer",
+        "avatar": "AV"
+      },
+      "department": "Design",
+      "allocatedOn": "2025-01-08",
+      "dueDate": "2026-01-08",
+      "status": "Active"
+    },
+    {
+      "id": "ALC-2025-00128",
+      "asset": {
+        "name": "Projector Epson",
+        "code": "PR-0012",
+        "image": "Projector"
+      },
+      "employee": {
+        "name": "Sales Team",
+        "role": "Team",
+        "avatar": "ST"
+      },
+      "department": "Sales",
+      "allocatedOn": "2025-01-07",
+      "dueDate": "2025-01-07",
+      "status": "Pending"
+    },
+    {
+      "id": "ALC-2025-00127",
+      "asset": {
+        "name": "Dell XPS 13",
+        "code": "AF-0002",
+        "image": "Laptop"
+      },
+      "employee": {
+        "name": "Neha Patil",
+        "role": "HR Manager",
+        "avatar": "NP"
+      },
+      "department": "HR Department",
+      "allocatedOn": "2024-12-15",
+      "dueDate": "2025-01-05",
+      "status": "Overdue"
+    },
+    {
+      "id": "ALC-2025-00126",
+      "asset": {
+        "name": "HP LaserJet Pro",
+        "code": "PR-0022",
+        "image": "Printer"
+      },
+      "employee": {
+        "name": "Sanjay Kumar",
+        "role": "Operations Lead",
+        "avatar": "SK"
+      },
+      "department": "IT Department",
+      "allocatedOn": "2024-11-20",
+      "dueDate": "2024-12-20",
+      "status": "Returned"
+    }
+  ]
+}

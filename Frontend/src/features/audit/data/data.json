@@ -1,0 +1,280 @@
+{
+  "stats": [
+    {
+      "id": "stat-total",
+      "title": "Total Audits",
+      "value": "28",
+      "subtitle": "All time",
+      "icon": "ClipboardCheck",
+      "color": "indigo"
+    },
+    {
+      "id": "stat-completed",
+      "title": "Completed",
+      "value": "12",
+      "subtitle": "This month",
+      "icon": "BadgeCheck",
+      "color": "green"
+    },
+    {
+      "id": "stat-progress",
+      "title": "In Progress",
+      "value": "5",
+      "subtitle": "Currently running",
+      "icon": "Clock",
+      "color": "blue"
+    },
+    {
+      "id": "stat-overdue",
+      "title": "Overdue",
+      "value": "3",
+      "subtitle": "Past due date",
+      "icon": "AlertCircle",
+      "color": "red"
+    },
+    {
+      "id": "stat-compliance",
+      "title": "Compliance Rate",
+      "value": "98%",
+      "subtitle": "This month",
+      "icon": "ShieldCheck",
+      "color": "green"
+    }
+  ],
+  "auditTypes": [
+    "IT Assets",
+    "Equipment",
+    "Furniture",
+    "Electrical",
+    "Vehicle",
+    "Safety"
+  ],
+  "statuses": [
+    "Scheduled",
+    "In Progress",
+    "Completed",
+    "Overdue",
+    "Cancelled"
+  ],
+  "locations": [
+    "IT Floor - 1",
+    "IT Floor - 2",
+    "Main Office",
+    "All Floors",
+    "Server Room",
+    "Warehouse"
+  ],
+  "auditors": [
+    { "name": "Priya Shah", "department": "IT Department", "avatar": "/avatars/priya.png" },
+    { "name": "Rohan Mehta", "department": "Finance Dept.", "avatar": "/avatars/rohan.png" },
+    { "name": "Ankit Verma", "department": "Admin Dept.", "avatar": "/avatars/ankit.png" },
+    { "name": "Neha Patil", "department": "Facilities Dept.", "avatar": "/avatars/neha.png" },
+    { "name": "Sanjay Kumar", "department": "IT Department", "avatar": "/avatars/sanjay.png" }
+  ],
+  "tabs": [
+    "All Audits",
+    "Scheduled",
+    "In Progress",
+    "Completed",
+    "Overdue",
+    "Cancelled"
+  ],
+  "compliance": [
+    { "name": "Compliant", "value": 96, "percentage": 98, "color": "#22C55E" },
+    { "name": "Non-Compliant", "value": 2, "percentage": 2, "color": "#EF4444" }
+  ],
+  "auditTypeBreakdown": [
+    { "name": "IT Assets", "value": 12 },
+    { "name": "Equipment", "value": 8 },
+    { "name": "Furniture", "value": 5 },
+    { "name": "Electrical", "value": 3 },
+    { "name": "Others", "value": 0 }
+  ],
+  "upcomingAudits": [
+    {
+      "id": "AU-2025-0029",
+      "name": "Server Room Audit",
+      "scheduledOn": "2025-05-20"
+    },
+    {
+      "id": "AU-2025-0030",
+      "name": "Vehicle Audit",
+      "scheduledOn": "2025-05-22"
+    },
+    {
+      "id": "AU-2025-0031",
+      "name": "Lab Equipment Audit",
+      "scheduledOn": "2025-05-24"
+    }
+  ],
+  "checklists": {
+    "IT Equipment Checklist": [
+      { "id": "chk-it-1", "task": "Verify Asset Tag", "completed": true },
+      { "id": "chk-it-2", "task": "Check Physical Condition", "completed": true },
+      { "id": "chk-it-3", "task": "Verify Warranty", "completed": false },
+      { "id": "chk-it-4", "task": "Verify Assigned User", "completed": true }
+    ],
+    "Office Furniture Checklist": [
+      { "id": "chk-furn-1", "task": "Check Stability", "completed": true },
+      { "id": "chk-furn-2", "task": "Clean Surface", "completed": false },
+      { "id": "chk-furn-3", "task": "Verify Location", "completed": true }
+    ],
+    "Safety Audit Checklist": [
+      { "id": "chk-safe-1", "task": "Inspect Fire Extinguisher", "completed": true },
+      { "id": "chk-safe-2", "task": "Clear Fire Exit", "completed": true },
+      { "id": "chk-safe-3", "task": "Verify First Aid Kit", "completed": false }
+    ]
+  },
+  "audits": [
+    {
+      "id": "AU-2025-0028",
+      "name": "IT Assets Audit - May 2025",
+      "type": "IT Assets",
+      "location": "IT Floor - 2",
+      "scheduledOn": "2025-05-18",
+      "status": "In Progress",
+      "auditor": {
+        "name": "Priya Shah",
+        "department": "IT Department",
+        "avatar": "/avatars/priya.png"
+      },
+      "checklistTemplate": "IT Equipment Checklist",
+      "notes": "Perform random checks on the central laptops inventory.",
+      "checklist": [
+        { "id": "c1", "task": "Verify Asset Tag", "completed": true },
+        { "id": "c2", "task": "Check Physical Condition", "completed": true },
+        { "id": "c3", "task": "Verify Warranty", "completed": false },
+        { "id": "c4", "task": "Verify Assigned User", "completed": true }
+      ],
+      "findings": {
+        "passed": 3,
+        "failed": 1,
+        "warnings": 0
+      },
+      "timeline": [
+        { "title": "Audit Scheduled", "time": "12 May 2025" },
+        { "title": "Audit Started", "time": "18 May 2025" }
+      ]
+    },
+    {
+      "id": "AU-2025-0027",
+      "name": "Office Equipment Audit",
+      "type": "Equipment",
+      "location": "Main Office",
+      "scheduledOn": "2025-05-17",
+      "status": "Completed",
+      "auditor": {
+        "name": "Rohan Mehta",
+        "department": "Finance Dept.",
+        "avatar": "/avatars/rohan.png"
+      },
+      "checklistTemplate": "IT Equipment Checklist",
+      "notes": "Verify physical counts of printers and scanners.",
+      "checklist": [
+        { "id": "c1", "task": "Verify Asset Tag", "completed": true },
+        { "id": "c2", "task": "Check Physical Condition", "completed": true },
+        { "id": "c3", "task": "Verify Warranty", "completed": true },
+        { "id": "c4", "task": "Verify Assigned User", "completed": true }
+      ],
+      "findings": {
+        "passed": 4,
+        "failed": 0,
+        "warnings": 0
+      },
+      "timeline": [
+        { "title": "Audit Scheduled", "time": "10 May 2025" },
+        { "title": "Audit Started", "time": "17 May 2025" },
+        { "title": "Checklist Completed", "time": "17 May 2025" },
+        { "title": "Audit Submitted", "time": "17 May 2025" }
+      ]
+    },
+    {
+      "id": "AU-2025-0026",
+      "name": "Furniture Audit",
+      "type": "Furniture",
+      "location": "All Floors",
+      "scheduledOn": "2025-05-15",
+      "status": "Completed",
+      "auditor": {
+        "name": "Ankit Verma",
+        "department": "Admin Dept.",
+        "avatar": "/avatars/ankit.png"
+      },
+      "checklistTemplate": "Office Furniture Checklist",
+      "notes": "Audit ergonomics desks and chairs stability.",
+      "checklist": [
+        { "id": "c1", "task": "Check Stability", "completed": true },
+        { "id": "c2", "task": "Clean Surface", "completed": true },
+        { "id": "c3", "task": "Verify Location", "completed": true }
+      ],
+      "findings": {
+        "passed": 3,
+        "failed": 0,
+        "warnings": 0
+      },
+      "timeline": [
+        { "title": "Audit Scheduled", "time": "10 May 2025" },
+        { "title": "Audit Started", "time": "15 May 2025" },
+        { "title": "Checklist Completed", "time": "15 May 2025" },
+        { "title": "Audit Submitted", "time": "15 May 2025" }
+      ]
+    },
+    {
+      "id": "AU-2025-0025",
+      "name": "Electrical Assets Audit",
+      "type": "Electrical",
+      "location": "IT Floor - 1",
+      "scheduledOn": "2025-05-14",
+      "status": "Overdue",
+      "auditor": {
+        "name": "Neha Patil",
+        "department": "Facilities Dept.",
+        "avatar": "/avatars/neha.png"
+      },
+      "checklistTemplate": "Safety Audit Checklist",
+      "notes": "Check UPS batteries and air conditioners load capacity.",
+      "checklist": [
+        { "id": "c1", "task": "Inspect Fire Extinguisher", "completed": false },
+        { "id": "c2", "task": "Clear Fire Exit", "completed": false },
+        { "id": "c3", "task": "Verify First Aid Kit", "completed": false }
+      ],
+      "findings": {
+        "passed": 0,
+        "failed": 0,
+        "warnings": 3
+      },
+      "timeline": [
+        { "title": "Audit Scheduled", "time": "08 May 2025" }
+      ]
+    },
+    {
+      "id": "AU-2025-0024",
+      "name": "Network Devices Audit",
+      "type": "IT Assets",
+      "location": "Server Room",
+      "scheduledOn": "2025-05-13",
+      "status": "Scheduled",
+      "auditor": {
+        "name": "Sanjay Kumar",
+        "department": "IT Department",
+        "avatar": "/avatars/sanjay.png"
+      },
+      "checklistTemplate": "IT Equipment Checklist",
+      "notes": "Verify network rack cables, patch panel labeling, switches functionality.",
+      "checklist": [
+        { "id": "c1", "task": "Verify Asset Tag", "completed": false },
+        { "id": "c2", "task": "Check Physical Condition", "completed": false },
+        { "id": "c3", "task": "Verify Warranty", "completed": false },
+        { "id": "c4", "task": "Verify Assigned User", "completed": false }
+      ],
+      "findings": {
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0
+      },
+      "timeline": [
+        { "title": "Audit Scheduled", "time": "06 May 2025" }
+      ]
+    }
+  ]
+}

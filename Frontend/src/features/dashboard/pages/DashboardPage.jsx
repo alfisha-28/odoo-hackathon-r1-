@@ -1,4 +1,4 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import StatCard from '../components/StatCard';
 import QuickActionCard from '../components/QuickActionCard';
 import AlertBanner from '../components/AlertBanner';
@@ -10,10 +10,17 @@ import UpcomingReturns from '../components/UpcomingReturns';
 import dashboardData from '../data/data.json';
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const greetingName = "John"; // Default fallback
   
   const handleQuickAction = (actionTitle) => {
-    alert(`Triggered action: "${actionTitle}"`);
+    if (actionTitle === 'Book Resource') {
+      navigate('/bookings');
+    } else if (actionTitle === 'Register Asset') {
+      navigate('/assets/register');
+    } else {
+      alert(`Triggered action: "${actionTitle}"`);
+    }
   };
 
   const handleOverdueAction = () => {
