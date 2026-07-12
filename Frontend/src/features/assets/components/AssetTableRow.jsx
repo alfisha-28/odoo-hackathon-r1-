@@ -70,20 +70,20 @@ export default function AssetTableRow({
       {/* Asset Tag */}
       <td className="py-4.5 px-4 align-middle">
         <span className="text-xs font-black text-[#7C3AED] hover:underline">
-          {asset.tag}
+          {asset.assetTag || asset.tag}
         </span>
       </td>
 
       {/* Asset Thumbnail, Name & SN */}
       <td className="py-4.5 px-4 align-middle">
         <div className="flex items-center gap-3">
-          {renderThumbnail(asset.category)}
+          {renderThumbnail(asset.category?.name || asset.category || '')}
           <div className="flex flex-col min-w-0">
             <span className="text-xs font-black text-[#111827] truncate">
               {asset.name}
             </span>
             <span className="text-[10px] font-bold text-[#9CA3AF] mt-0.5">
-              SN: {asset.serialNumber}
+              SN: {asset.serialNumber || 'N/A'}
             </span>
           </div>
         </div>
@@ -91,12 +91,12 @@ export default function AssetTableRow({
 
       {/* Category */}
       <td className="py-4.5 px-4 align-middle">
-        <CategoryBadge category={asset.category} />
+        <CategoryBadge category={asset.category?.name || asset.category || 'Uncategorized'} />
       </td>
 
       {/* Department */}
       <td className="py-4.5 px-4 align-middle">
-        <span className="text-xs font-bold text-[#475569]">{asset.department}</span>
+        <span className="text-xs font-bold text-[#475569]">{asset.department?.name || asset.department || 'N/A'}</span>
       </td>
 
       {/* Location */}
@@ -106,13 +106,13 @@ export default function AssetTableRow({
 
       {/* Assigned To */}
       <td className="py-4.5 px-4 align-middle">
-        {asset.assignedTo ? (
+        {asset.assignedTo || asset.currentAllocation?.allocatedToEmp?.name ? (
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-[#F5F3FF] text-[#7C3AED] border border-[#EDE9FE] flex items-center justify-center text-[9px] font-black shadow-sm flex-shrink-0">
-              {getInitials(asset.assignedTo)}
+              {getInitials(asset.assignedTo || asset.currentAllocation?.allocatedToEmp?.name)}
             </div>
             <span className="text-xs font-bold text-[#475569] truncate max-w-[120px]">
-              {asset.assignedTo}
+              {asset.assignedTo || asset.currentAllocation?.allocatedToEmp?.name}
             </span>
           </div>
         ) : (

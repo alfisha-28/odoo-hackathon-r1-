@@ -45,8 +45,8 @@ export default function AssetFilters({
             >
               <option value="">All Categories</option>
               {filterOptions.categories?.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
+                <option key={cat.value || cat} value={cat.value || cat}>
+                  {cat.label || cat}
                 </option>
               ))}
             </select>
@@ -67,8 +67,8 @@ export default function AssetFilters({
             >
               <option value="">All Statuses</option>
               {filterOptions.statuses?.map((stat) => (
-                <option key={stat} value={stat}>
-                  {stat}
+                <option key={stat.value || stat} value={stat.value || stat}>
+                  {stat.label || stat}
                 </option>
               ))}
             </select>
@@ -89,8 +89,8 @@ export default function AssetFilters({
             >
               <option value="">All Departments</option>
               {filterOptions.departments?.map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
+                <option key={dept.value || dept} value={dept.value || dept}>
+                  {dept.label || dept}
                 </option>
               ))}
             </select>
@@ -111,8 +111,8 @@ export default function AssetFilters({
             >
               <option value="">All Locations</option>
               {filterOptions.locations?.map((loc) => (
-                <option key={loc} value={loc}>
-                  {loc}
+                <option key={loc.value || loc} value={loc.value || loc}>
+                  {loc.label || loc}
                 </option>
               ))}
             </select>

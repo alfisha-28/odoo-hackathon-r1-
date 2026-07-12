@@ -15,7 +15,7 @@ export default function AllocationForm({ onCancel, onSubmitSuccess }) {
   useEffect(() => {
     const loadFormData = async () => {
       try {
-        const assetsRes = await assetService.getAssets({ limit: 100 });
+        const assetsRes = await assetService.getAssets({ limit: 100, status: 'AVAILABLE' });
         setDbAssets(assetsRes.assets || assetsRes.data || []);
       } catch (err) {
         console.error("Failed to load assets for allocation form:", err);

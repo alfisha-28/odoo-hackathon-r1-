@@ -8,6 +8,7 @@ import Pagination from '../components/Pagination';
 
 import assetData from '../data/data.json';
 import { assetService } from '../services/assetService';
+import { organizationService } from '../../organization/services/organizationService';
 
 export default function AssetDirectoryPage() {
   const navigate = useNavigate();
@@ -35,6 +36,53 @@ export default function AssetDirectoryPage() {
   const [totalAssets, setTotalAssets] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  // Dynamic Filters State
+  const [dbCategories, setDbCategories] = useState([]);
+  const [dbDepartments, setDbDepartments] = useState([]);
+
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const [catData, deptData] = await Promise.all([
+          organizationService.getCategories(),
+          organizationService.getDepartments()
+        ]);
+        setDbCategories(catData || []);
+        setDbDepartments(deptData || []);
+      } catch (err) {
+        console.error("Failed to load filter options", err);
+      }
+    };
+    loadFilters();
+  }, []);
+
+  // KPIs State
+  const [kpis, setKpis] = useState({
+    total: 0,
+    available: 0,
+    allocated: 0,
+    maintenance: 0,
+  });
+
+  const fetchKPIs = async () => {
+    try {
+      const [totalRes, availableRes, allocatedRes, maintenanceRes] = await Promise.all([
+        assetService.getAssets({ limit: 1 }),
+        assetService.getAssets({ status: 'AVAILABLE', limit: 1 }),
+        assetService.getAssets({ status: 'ALLOCATED', limit: 1 }),
+        assetService.getAssets({ status: 'UNDER_MAINTENANCE', limit: 1 }),
+      ]);
+      setKpis({
+        total: totalRes?.meta?.total || totalRes?.total || 0,
+        available: availableRes?.meta?.total || availableRes?.total || 0,
+        allocated: allocatedRes?.meta?.total || allocatedRes?.total || 0,
+        maintenance: maintenanceRes?.meta?.total || maintenanceRes?.total || 0,
+      });
+    } catch (err) {
+      console.error("Failed to load asset KPIs:", err);
+    }
+  };
+
   // Reset page when filter queries change
   useEffect(() => {
     setCurrentPage(1);
@@ -52,8 +100,8 @@ export default function AssetDirectoryPage() {
         page: currentPage,
         limit: itemsPerPage
       });
-      setAssets(data.assets);
-      setTotalAssets(data.total);
+      setAssets(data.assets || data.data || []);
+      setTotalAssets(data.meta?.total || data.total || 0);
     } catch (err) {
       console.error('Failed to load assets', err);
     } finally {
@@ -63,7 +111,47 @@ export default function AssetDirectoryPage() {
 
   useEffect(() => {
     fetchAssets();
+    fetchKPIs();
   }, [searchQuery, selectedCategory, selectedStatus, selectedDepartment, selectedLocation, currentPage, itemsPerPage]);
+
+  const dynamicStats = [
+    {
+      id: "stat-total",
+      title: "Total Assets",
+      value: kpis.total,
+      change: "Active Inventory",
+      isPositive: true,
+      icon: "Package",
+      color: "indigo"
+    },
+    {
+      id: "stat-available",
+      title: "Available",
+      value: kpis.available,
+      change: "Ready for allocation",
+      isPositive: true,
+      icon: "CheckCircle2",
+      color: "emerald"
+    },
+    {
+      id: "stat-allocated",
+      title: "Allocated",
+      value: kpis.allocated,
+      change: "In use",
+      isPositive: true,
+      icon: "UserCheck",
+      color: "violet"
+    },
+    {
+      id: "stat-maintenance",
+      title: "Under Maintenance",
+      value: kpis.maintenance,
+      change: "Requires attention",
+      isPositive: false,
+      icon: "Wrench",
+      color: "orange"
+    }
+  ];
 
   // Handle filter resets
   const handleResetFilters = () => {
@@ -125,6 +213,21 @@ export default function AssetDirectoryPage() {
     alert(`More Actions for Asset ID: ${id}`);
   };
 
+  const dynamicFilterOptions = {
+    categories: dbCategories.map(c => ({ value: c.id, label: c.name })),
+    statuses: [
+      { value: 'AVAILABLE', label: 'Available' },
+      { value: 'ALLOCATED', label: 'Allocated' },
+      { value: 'RESERVED', label: 'Reserved' },
+      { value: 'UNDER_MAINTENANCE', label: 'Maintenance' },
+      { value: 'LOST', label: 'Lost' },
+      { value: 'RETIRED', label: 'Retired' },
+      { value: 'DISPOSED', label: 'Disposed' },
+    ],
+    departments: dbDepartments.map(d => ({ value: d.id, label: d.name })),
+    locations: assetData.filters.locations.map(loc => ({ value: loc, label: loc })), // Keep static locations as they are just strings in db
+  };
+
   return (
     <>
       {/* Header section */}
@@ -154,7 +257,7 @@ export default function AssetDirectoryPage() {
 
       {/* Asset Stats Summary */}
       <section>
-        <AssetStats stats={assetData.stats} />
+        <AssetStats stats={dynamicStats} />
       </section>
 
       {/* Filter Card */}
@@ -170,7 +273,7 @@ export default function AssetDirectoryPage() {
           setSelectedDepartment={setSelectedDepartment}
           selectedLocation={selectedLocation}
           setSelectedLocation={setSelectedLocation}
-          filterOptions={assetData.filters}
+          filterOptions={dynamicFilterOptions}
           onReset={handleResetFilters}
         />
       </section>
