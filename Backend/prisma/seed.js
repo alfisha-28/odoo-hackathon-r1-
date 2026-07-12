@@ -76,6 +76,7 @@ async function main() {
     }
   }
 
+  // --- Sample Assets (Phase 2) ---
   const laptopCat = await prisma.assetCategory.findFirst({ where: { name: 'Laptops', organizationId: org.id } });
   const monitorCat = await prisma.assetCategory.findFirst({ where: { name: 'Monitors', organizationId: org.id } });
   const furnitureCat = await prisma.assetCategory.findFirst({ where: { name: 'Furniture', organizationId: org.id } });
@@ -86,7 +87,7 @@ async function main() {
       assetTag: 'AF-0001',
       name: 'Dell XPS 15 Laptop',
       categoryId: laptopCat?.id,
-      status: 'AVAILABLE',
+      status: 'ALLOCATED',
       condition: 'GOOD',
       serialNumber: 'SN-DXPS-001',
       location: 'Engineering Office',
@@ -108,27 +109,27 @@ async function main() {
     },
     {
       assetTag: 'AF-0003',
-      name: 'LG UltraWide 34" Monitor',
+      name: 'Conference Room Projector',
       categoryId: monitorCat?.id,
       status: 'AVAILABLE',
       condition: 'GOOD',
-      serialNumber: 'SN-LG34-003',
-      location: 'Engineering Office',
-      isBookable: false,
+      serialNumber: 'SN-PROJ-003',
+      location: 'Conference Room A',
+      isBookable: true,
       acquisitionDate: new Date('2023-11-20'),
-      acquisitionCost: 549.00,
+      acquisitionCost: 849.00,
     },
     {
       assetTag: 'AF-0004',
-      name: 'Ergonomic Office Chair',
-      categoryId: furnitureCat?.id,
+      name: 'Shared Testing Device (iPad Pro)',
+      categoryId: laptopCat?.id, // Closest match
       status: 'AVAILABLE',
       condition: 'FAIR',
-      serialNumber: null,
-      location: 'HR Office',
-      isBookable: false,
+      serialNumber: 'SN-IPAD-004',
+      location: 'QA Lab',
+      isBookable: true,
       acquisitionDate: new Date('2022-06-01'),
-      acquisitionCost: 350.00,
+      acquisitionCost: 1100.00,
     },
     {
       assetTag: 'AF-0005',
@@ -151,7 +152,7 @@ async function main() {
     }
     const existing = await prisma.asset.findUnique({ where: { assetTag: a.assetTag } });
     if (!existing) {
-      await prisma.asset.create({
+      const asset = await prisma.asset.create({
         data: {
           ...a,
           organizationId: org.id,
@@ -167,6 +168,57 @@ async function main() {
         },
       });
       console.log(`✅  Asset created: ${a.assetTag} — ${a.name}`);
+
+      // Seed an allocation for AF-0001
+      if (a.assetTag === 'AF-0001') {
+         await prisma.allocation.create({
+            data: {
+               assetId: asset.id,
+               allocatedToEmpId: admin.id,
+               allocatedById: admin.id,
+               status: 'ACTIVE',
+               allocationDate: new Date(),
+            }
+         });
+         console.log(`✅  Allocation created for: ${a.assetTag} to ${admin.name}`);
+      }
+
+      // Seed an upcoming booking for AF-0003 (Tomorrow 10:00 - 11:00)
+      if (a.assetTag === 'AF-0003') {
+         const tomorrow = new Date();
+         tomorrow.setDate(tomorrow.getDate() + 1);
+         tomorrow.setHours(10, 0, 0, 0);
+         
+         const tomorrowEnd = new Date(tomorrow);
+         tomorrowEnd.setHours(11, 0, 0, 0);
+
+         await prisma.booking.create({
+            data: {
+               assetId: asset.id,
+               bookedById: admin.id,
+               startTime: tomorrow,
+               endTime: tomorrowEnd,
+               purpose: 'Team sync',
+               status: 'UPCOMING',
+            }
+         });
+         console.log(`✅  Booking created for: ${a.assetTag}`);
+      }
+
+      // Seed a pending maintenance request for AF-0004
+      if (a.assetTag === 'AF-0004') {
+         await prisma.maintenanceRequest.create({
+            data: {
+               assetId: asset.id,
+               raisedById: admin.id,
+               issueDescription: 'Screen flickering occasionally',
+               priority: 'MEDIUM',
+               status: 'PENDING',
+            }
+         });
+         console.log(`✅  Maintenance request created for: ${a.assetTag}`);
+      }
+
     } else {
       console.log(`ℹ️   Asset already exists: ${a.assetTag}`);
     }

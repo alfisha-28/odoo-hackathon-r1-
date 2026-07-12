@@ -43,16 +43,25 @@
 
 ---
 
-## Phase 3 — Not yet implemented
+## Phase 3A — Implemented ✅
 
 ### Allocations (`/api/allocations`)
-- `POST /api/allocations` — Allocate asset to employee/department
-- `POST /api/allocations/:id/return` — Record asset return
+| Method | Path | Auth | Role | Description |
+|--------|------|------|------|-------------|
+| GET | `/api/allocations` | Bearer JWT | any | List allocations (Employees only see their own/their dept's) |
+| POST | `/api/allocations` | Bearer JWT | ASSET_MANAGER, ADMIN | Allocate asset to employee/department (checks double allocation) |
+| POST | `/api/allocations/:id/return` | Bearer JWT | ASSET_MANAGER, ADMIN | Record asset return and update checkInCondition |
 
 ### Transfers (`/api/transfers`)
-- `GET /api/transfers` — List transfer requests
-- `POST /api/transfers` — Raise transfer request
-- `PATCH /api/transfers/:id` — Approve/reject transfer
+| Method | Path | Auth | Role | Description |
+|--------|------|------|------|-------------|
+| GET | `/api/transfers` | Bearer JWT | any | List transfer requests (Employees only see their own) |
+| POST | `/api/transfers` | Bearer JWT | any | Raise transfer request for active allocation |
+| PATCH | `/api/transfers/:id` | Bearer JWT | ASSET_MANAGER, DEPT_HEAD, ADMIN | Approve/reject transfer (auto-reallocates on approve) |
+
+---
+
+## Phase 3B — Not yet implemented
 
 ### Bookings (`/api/bookings`)
 - `GET /api/bookings` — List bookings

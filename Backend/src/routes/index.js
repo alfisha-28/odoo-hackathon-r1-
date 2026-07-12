@@ -28,4 +28,16 @@ router.use('/employees', employeesRouter);
 // Phase 2 feature routes
 router.use('/assets', assetsRouter);
 
+// Phase 3A feature routes
+const allocationsRouter = require('../features/allocations/allocations.routes');
+const transfersRouter = require('../features/transfers/transfers.routes');
+router.use('/allocations', allocationsRouter);
+router.use('/transfers', transfersRouter);
+
+// Phase 3B feature routes
+const bookingsRouter = require('../features/bookings/bookings.routes');
+const maintenanceRouter = require('../features/maintenance/maintenance.routes');
+router.use('/bookings', bookingsRouter);
+router.use('/maintenance', maintenanceRouter);
+
 module.exports = router;

@@ -235,3 +235,266 @@ Authorization: Bearer {{p2AdminToken}}
 {
   "status": "RETIRED"
 }
+
+###
+### ═════════════════════════════════════════════
+### PHASE 3A — Allocations & Transfers Verification
+### ═════════════════════════════════════════════
+
+### ─────────────────────────────────────────────
+### P3-1. Admin login (reuse seeded admin)
+### ─────────────────────────────────────────────
+# @name p3AdminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@assetflow.io",
+  "password": "Admin@1234"
+}
+
+@p3AdminToken = {{p3AdminLogin.response.body.data.token}}
+
+### ─────────────────────────────────────────────
+### P3-2. GET Assets to find an AVAILABLE one (e.g. AF-0002)
+###       and the ALLOCATED one (AF-0001)
+### ─────────────────────────────────────────────
+# @name getP3Assets
+GET {{baseUrl}}/assets
+Authorization: Bearer {{p3AdminToken}}
+
+@availableAssetId = {{getP3Assets.response.body.data[1].id}}
+@allocatedAssetId = {{getP3Assets.response.body.data[0].id}}
+
+### ─────────────────────────────────────────────
+### P3-3. Get an employee ID to allocate to
+### ─────────────────────────────────────────────
+# @name getP3Employees
+GET {{baseUrl}}/employees
+Authorization: Bearer {{p3AdminToken}}
+
+@targetEmpId = {{getP3Employees.response.body.data.employees[0].id}}
+
+### ─────────────────────────────────────────────
+### P3-4. Allocate the AVAILABLE asset (AF-0002)
+### ─────────────────────────────────────────────
+# @name createAllocation
+POST {{baseUrl}}/allocations
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "assetId": "{{availableAssetId}}",
+  "allocatedToEmpId": "{{targetEmpId}}"
+}
+
+### ─────────────────────────────────────────────
+### P3-5. Double Allocation test — try to allocate AF-0001
+###       which was seeded as ALLOCATED. Should return 409
+###       and the holder's name.
+### ─────────────────────────────────────────────
+POST {{baseUrl}}/allocations
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "assetId": "{{allocatedAssetId}}",
+  "allocatedToEmpId": "{{targetEmpId}}"
+}
+
+### ─────────────────────────────────────────────
+### P3-6. Transfer Request for the newly allocated asset (AF-0002)
+### ─────────────────────────────────────────────
+# @name createTransfer
+POST {{baseUrl}}/transfers
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "assetId": "{{availableAssetId}}",
+  "requestedToEmpId": "{{targetEmpId}}",
+  "reason": "Moving teams"
+}
+
+@transferId = {{createTransfer.response.body.data.transfer.id}}
+
+### ─────────────────────────────────────────────
+### P3-7. Approve the Transfer
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/transfers/{{transferId}}
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "action": "APPROVE"
+}
+
+### ─────────────────────────────────────────────
+### P3-8. Return the asset (AF-0002) - Need to fetch allocations to get ID
+### ─────────────────────────────────────────────
+# @name getActiveAllocations
+GET {{baseUrl}}/allocations?assetId={{availableAssetId}}&status=ACTIVE
+Authorization: Bearer {{p3AdminToken}}
+
+@activeAllocationId = {{getActiveAllocations.response.body.data.data[0].id}}
+
+### ─────────────────────────────────────────────
+### P3-9. Process the return
+### ─────────────────────────────────────────────
+POST {{baseUrl}}/allocations/{{activeAllocationId}}/return
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "checkInCondition": "FAIR",
+  "checkInNotes": "Returned after transfer test"
+}
+
+### ─────────────────────────────────────────────
+### P3-10. Verify Employee RBAC on Allocations
+### ─────────────────────────────────────────────
+GET {{baseUrl}}/allocations
+Authorization: Bearer {{p3AdminToken}}
+
+###
+### ═════════════════════════════════════════════
+### PHASE 3B — Bookings & Maintenance Verification
+### ═════════════════════════════════════════════
+
+### ─────────────────────────────────────────────
+### P3B-1. GET Bookable and Non-Bookable Asset IDs
+### ─────────────────────────────────────────────
+# @name getP3BAssets
+GET {{baseUrl}}/assets
+Authorization: Bearer {{p3AdminToken}}
+
+@bookableAssetId = {{getP3BAssets.response.body.data[2].id}} 
+# AF-0003 is index 2
+@nonBookableAssetId = {{getP3BAssets.response.body.data[0].id}} 
+# AF-0001 is index 0
+
+@maintenanceAssetId = {{getP3BAssets.response.body.data[3].id}} 
+# AF-0004 is index 3
+
+### ─────────────────────────────────────────────
+### P3B-2. Attempt to book a non-bookable asset (AF-0001)
+### ─────────────────────────────────────────────
+POST {{baseUrl}}/bookings
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "assetId": "{{nonBookableAssetId}}",
+  "startTime": "2030-01-01T09:00:00.000Z",
+  "endTime": "2030-01-01T10:00:00.000Z"
+}
+
+### ─────────────────────────────────────────────
+### P3B-3. Book a bookable asset (AF-0003) for 9:00-10:00
+### ─────────────────────────────────────────────
+# @name createBooking
+POST {{baseUrl}}/bookings
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "assetId": "{{bookableAssetId}}",
+  "startTime": "2030-01-01T09:00:00.000Z",
+  "endTime": "2030-01-01T10:00:00.000Z",
+  "purpose": "Strategy Sync"
+}
+
+### ─────────────────────────────────────────────
+### P3B-4. Attempt to book the SAME asset for 9:30-10:30 (Overlap!)
+### ─────────────────────────────────────────────
+POST {{baseUrl}}/bookings
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "assetId": "{{bookableAssetId}}",
+  "startTime": "2030-01-01T09:30:00.000Z",
+  "endTime": "2030-01-01T10:30:00.000Z"
+}
+
+### ─────────────────────────────────────────────
+### P3B-5. Book back-to-back 10:00-11:00 (Allowed)
+### ─────────────────────────────────────────────
+POST {{baseUrl}}/bookings
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "assetId": "{{bookableAssetId}}",
+  "startTime": "2030-01-01T10:00:00.000Z",
+  "endTime": "2030-01-01T11:00:00.000Z"
+}
+
+### ─────────────────────────────────────────────
+### P3B-6. Raise a maintenance request
+### ─────────────────────────────────────────────
+# @name raiseMaintenance
+POST {{baseUrl}}/maintenance
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "assetId": "{{maintenanceAssetId}}",
+  "issueDescription": "Screen cracked during test",
+  "priority": "HIGH"
+}
+
+@maintenanceReqId = {{raiseMaintenance.response.body.data.request.id}}
+
+### ─────────────────────────────────────────────
+### P3B-7. Approve Maintenance (flips asset to UNDER_MAINTENANCE)
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/maintenance/{{maintenanceReqId}}
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "status": "APPROVED"
+}
+
+### ─────────────────────────────────────────────
+### P3B-8. Verify Asset is UNDER_MAINTENANCE
+### ─────────────────────────────────────────────
+GET {{baseUrl}}/assets/{{maintenanceAssetId}}
+Authorization: Bearer {{p3AdminToken}}
+
+### ─────────────────────────────────────────────
+### P3B-9. Invalid Transition Check (Jump to RESOLVED directly)
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/maintenance/{{maintenanceReqId}}
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "status": "RESOLVED",
+  "resolutionNotes": "Fixed screen"
+}
+
+### ─────────────────────────────────────────────
+### P3B-10. Valid Transition (IN_PROGRESS)
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/maintenance/{{maintenanceReqId}}
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "status": "IN_PROGRESS"
+}
+
+### ─────────────────────────────────────────────
+### P3B-11. Valid Transition (RESOLVED) (flips back to AVAILABLE)
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/maintenance/{{maintenanceReqId}}
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "status": "RESOLVED",
+  "resolutionNotes": "Screen replaced successfully"
+}
+
