@@ -4,30 +4,28 @@ import defaultData from '../data/data.json';
 let notificationsCache = [...defaultData.notifications];
 let settingsCache = { ...defaultData.settings };
 
+import apiClient from '../../../shared/services/apiClient';
+
 export const notificationService = {
-  getNotifications: async () => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return [...notificationsCache];
+  getNotifications: async (unreadOnly = false) => {
+    try {
+      const response = await apiClient.get('/notifications', { params: { unreadOnly } });
+      return response.data.data.notifications || [];
+    } catch (e) {
+      return [...notificationsCache]; // fallback
+    }
   },
 
-  markAsRead: async (id) => {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    notificationsCache = notificationsCache.map((n) => {
-      if (n.id === id) {
-        // Update viewed timeline item if not already present
-        const hasViewed = n.timeline.some((t) => t.title === 'Viewed by User');
-        const updatedTimeline = [...n.timeline];
-        if (!hasViewed) {
-          const now = new Date();
-          const timeStr = `${now.getDate()} May 2025, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} ${now.getHours() >= 12 ? 'PM' : 'AM'}`;
-          updatedTimeline.push({ title: 'Viewed by User', time: timeStr });
-        }
-        return { ...n, status: 'Read', timeline: updatedTimeline };
-      }
-      return n;
-    });
-    return [...notificationsCache];
+  markAsRead: async (notificationIds) => {
+    // Expects an array or a single ID
+    const ids = Array.isArray(notificationIds) ? notificationIds : [notificationIds];
+    try {
+      const response = await apiClient.patch('/notifications', { markAsReadIds: ids });
+      return response.data.data;
+    } catch(e) {
+      // fallback
+      return [...notificationsCache];
+    }
   },
 
   markAllAsRead: async () => {

@@ -47,7 +47,13 @@ export default function EmployeeTable({ employees = [], onEdit, onDelete }) {
 
       {/* Role */}
       <td className="py-3.5 px-4 align-middle">
-        <RoleBadge role={emp.role} />
+        <div className="flex flex-wrap gap-1">
+          {Array.isArray(emp.roles) && emp.roles.length > 0 ? (
+            emp.roles.map((r) => <RoleBadge key={r} role={r} />)
+          ) : (
+            <RoleBadge role={emp.role} /> /* fallback for older mock data */
+          )}
+        </div>
       </td>
 
       {/* Department */}

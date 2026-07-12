@@ -63,17 +63,16 @@ export default function AuthCard() {
 
     try {
       if (activeTab === 'login') {
-        const user = await login(email, password);
-        loginStoreAction(user);
-        setSuccessMsg(`Welcome back, ${user.name}!`);
+        const { employee, token } = await login(email, password);
+        loginStoreAction(employee, token);
+        setSuccessMsg(`Welcome back, ${employee.name}!`);
       } else if (activeTab === 'register') {
         if (!agreeTerms) throw new Error('You must agree to the Terms of Service.');
-        const user = await register(name, email, password);
-        registerStoreAction(user);
-        setSuccessMsg(`Account created successfully for ${user.name}!`);
+        const { employee } = await register(name, email, password);
+        setSuccessMsg(`Account created successfully for ${employee.name}! Please switch to the login tab to log in.`);
       }
     } catch (err) {
-      setErrorMsg(err.message || 'An unexpected error occurred.');
+      setErrorMsg(err.response?.data?.message || err.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }

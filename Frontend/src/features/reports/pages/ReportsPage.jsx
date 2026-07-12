@@ -56,6 +56,7 @@ export default function ReportsPage() {
           allTypes,
           allFreqs,
           allRecipients,
+          analytics
         ] = await Promise.all([
           reportsService.getStats(startDate, endDate),
           reportsService.getAssetUtilization(startDate, endDate),
@@ -66,14 +67,18 @@ export default function ReportsPage() {
           reportsService.getReportTypes(),
           reportsService.getFrequencies(),
           reportsService.getRecipients(),
+          reportsService.getAnalyticsData()
         ]);
 
         setStats(allStats);
-        setAssetUtilization(allUtilization);
-        setAssetStatus(allStatus);
-        setDepartmentAllocation(allDepartment);
-        setMaintenanceTrend(allMaintenance);
-        setCategoryUtilization(allCategory);
+        
+        // Use the analytics telemetry if returned, fallback to mock
+        setAssetUtilization(analytics?.assetUtilization || allUtilization);
+        setAssetStatus(analytics?.assetStatus || allStatus);
+        setDepartmentAllocation(analytics?.departmentAllocation || allDepartment);
+        setMaintenanceTrend(analytics?.maintenanceTrend || allMaintenance);
+        setCategoryUtilization(analytics?.categoryUtilization || allCategory);
+        
         setReportTypes(allTypes);
         setFrequencies(allFreqs);
         setRecipientsList(allRecipients);

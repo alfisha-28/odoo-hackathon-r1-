@@ -1,39 +1,26 @@
-import mockData from '../data/data.json';
+import apiClient from '../../../shared/services/apiClient';
 
 export const maintenanceService = {
-  getStats: () => {
-    return Promise.resolve(mockData.stats);
+  getMaintenanceRequests: async ({ status = '', priority = '' } = {}) => {
+    const response = await apiClient.get('/maintenance', {
+      params: { status, priority },
+    });
+    // Returns: { success: true, data: { requests: [...] } }
+    return response.data.data.requests;
   },
 
-  getTabs: () => {
-    return Promise.resolve(mockData.tabs);
+  raiseRequest: async (requestData) => {
+    // Expects: { assetId, issueDescription, priority, photoUrl }
+    const response = await apiClient.post('/maintenance', requestData);
+    return response.data.data.request;
   },
 
-  getPriorities: () => {
-    return Promise.resolve(mockData.priorities);
-  },
-
-  getStatuses: () => {
-    return Promise.resolve(mockData.statuses);
-  },
-
-  getCategories: () => {
-    return Promise.resolve(mockData.categories);
-  },
-
-  getTechnicians: () => {
-    return Promise.resolve(mockData.technicians);
-  },
-
-  getTickets: () => {
-    return Promise.resolve(mockData.tickets);
-  },
-
-  getOverview: () => {
-    return Promise.resolve(mockData.overview);
-  },
-
-  getIssueCategories: () => {
-    return Promise.resolve(mockData.issueCategories);
+  updateRequestStatus: async (id, actionData) => {
+    // Action details can be:
+    // - Approve/Reject: { status: 'APPROVED' | 'REJECTED', rejectionReason }
+    // - Assign: { status: 'TECHNICIAN_ASSIGNED', technicianId }
+    // - Resolve: { status: 'RESOLVED', resolutionNotes }
+    const response = await apiClient.patch(`/maintenance/${id}`, actionData);
+    return response.data.data.request;
   },
 };

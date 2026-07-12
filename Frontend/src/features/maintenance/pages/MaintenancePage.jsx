@@ -17,19 +17,8 @@ import maintenanceData from '../data/data.json';
 
 export default function MaintenancePage() {
   // Initialize dynamic categories and ticket list
-  const [tickets, setTickets] = useState(() => {
-    return maintenanceData.tickets.map((t) => {
-      let category = 'Other';
-      if (t.id === 'MT-2025-0036' || t.id === 'MT-2025-0034' || t.id === 'MT-2025-0033' || t.id === 'MT-2025-0032') {
-        category = 'Hardware Failure';
-      } else if (t.id === 'MT-2025-0035') {
-        category = 'Performance Issue';
-      } else if (t.id === 'MT-2025-0031' || t.id === 'MT-2025-0030') {
-        category = 'Wear & Tear';
-      }
-      return { ...t, category };
-    });
-  });
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Modal controls
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
@@ -48,6 +37,27 @@ export default function MaintenancePage() {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+
+  const fetchTickets = async () => {
+    setLoading(true);
+    try {
+      const { maintenanceService } = await import('../services/maintenanceService');
+      const data = await maintenanceService.getMaintenanceRequests({
+        status: selectedStatus,
+        priority: selectedPriority,
+      });
+      setTickets(data || []);
+    } catch (err) {
+      console.error('Failed to fetch maintenance tickets:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  import { useEffect } from 'react';
+  useEffect(() => {
+    fetchTickets();
+  }, [selectedStatus, selectedPriority]);
 
   // Sync statistics dynamically with list state
   const computedStats = useMemo(() => {
@@ -220,46 +230,62 @@ export default function MaintenancePage() {
   };
 
   // Resolve Ticket action inside details modal
-  const handleResolveTicketAction = (id) => {
-    setTickets((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, status: 'Resolved' } : t))
-    );
-    setIsDetailsModalOpen(false);
-    setSelectedTicket(null);
-    alert(`Ticket ${id} has been marked as Resolved.`);
+  const handleResolveTicketAction = async (id) => {
+    try {
+      const { maintenanceService } = await import('../services/maintenanceService');
+      await maintenanceService.updateRequestStatus(id, { status: 'RESOLVED', resolutionNotes: 'Resolved via dashboard' });
+      alert(`Ticket ${id} has been marked as Resolved.`);
+      setIsDetailsModalOpen(false);
+      setSelectedTicket(null);
+      fetchTickets();
+    } catch (err) {
+      alert("Failed to resolve ticket.");
+    }
   };
 
-  const handleEditTicketAction = (id) => {
-    alert(`Edit Ticket workflow triggered for ID: ${id}`);
+  const handleEditTicketAction = async (id) => {
+    // Basic implementation for Role-Based Access (Approve/Assign)
+    const action = window.prompt("Action: Type 'approve', 'reject', or 'assign'", "approve");
+    if (!action) return;
+    
+    try {
+      const { maintenanceService } = await import('../services/maintenanceService');
+      if (action === 'approve') {
+        await maintenanceService.updateRequestStatus(id, { status: 'APPROVED' });
+        alert("Ticket approved! Asset is now under maintenance.");
+      } else if (action === 'reject') {
+        const reason = window.prompt("Rejection reason:");
+        await maintenanceService.updateRequestStatus(id, { status: 'REJECTED', rejectionReason: reason });
+        alert("Ticket rejected.");
+      } else if (action === 'assign') {
+        const techId = window.prompt("Enter Technician Employee ID:");
+        await maintenanceService.updateRequestStatus(id, { status: 'TECHNICIAN_ASSIGNED', technicianId: techId });
+        alert("Technician assigned!");
+      }
+      fetchTickets();
+    } catch (e) {
+      alert("Action failed.");
+    }
   };
 
   // Submit Request Modal Submission
-  const handleNewRequestSubmit = (formData) => {
-    console.log('Confirm Maintenance Request Values:', formData);
+  const handleNewRequestSubmit = async (formData) => {
+    try {
+      const { maintenanceService } = await import('../services/maintenanceService');
+      await maintenanceService.raiseRequest({
+        assetId: formData.assetId || formData.asset,
+        issueDescription: formData.description || formData.title,
+        priority: formData.priority,
+        photoUrl: formData.attachment ? 'https://example.com/photo.jpg' : null,
+      });
 
-    const newId = `MT-2025-00${37 + tickets.length}`;
-    const newTicket = {
-      id: newId,
-      asset: formData.asset,
-      issue: formData.title + ' - ' + formData.description,
-      priority: formData.priority,
-      reportedBy: {
-        name: 'John Doe', // Logged in user
-        department: 'Operations & IT',
-        avatar: '/avatars/john.png',
-      },
-      assignedTechnician: formData.technician || 'Unassigned',
-      status: 'Open',
-      reportedDate: formData.reportedDate,
-      dueDate: formData.dueDate,
-      category: formData.category,
-      notes: formData.notes,
-      attachment: formData.attachment,
-    };
-
-    setTickets((prev) => [newTicket, ...prev]);
-    setIsNewModalOpen(false);
-    alert(`Maintenance Ticket ${newId} submitted successfully!`);
+      setIsNewModalOpen(false);
+      alert(`Maintenance Ticket submitted successfully!`);
+      fetchTickets();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to submit maintenance request.");
+    }
   };
 
   const handleSaveDraft = (draftData) => {

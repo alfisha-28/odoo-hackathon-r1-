@@ -9,7 +9,7 @@ import CategoryTable from '../components/CategoryTable';
 import EmployeeTable from '../components/EmployeeTable';
 import Pagination from '../components/Pagination';
 
-import orgData from '../data/data.json';
+import { organizationService } from '../services/organizationService';
 import AddCategoryModal from '../components/AddCategoryModal';
 import AddEmployeeModal from '../components/AddEmployeeModal';
 
@@ -35,6 +35,13 @@ export default function OrganizationSetupPage() {
   // Responsive check
   const [isMobile, setIsMobile] = useState(false);
 
+  // Data States
+  const [departments, setDepartments] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [totalEmployees, setTotalEmployees] = useState(0);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -44,58 +51,69 @@ export default function OrganizationSetupPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Filtered Departments
+  const fetchAllData = async () => {
+    setLoading(true);
+    try {
+      const [depts, cats] = await Promise.all([
+        organizationService.getDepartments(),
+        organizationService.getCategories(),
+      ]);
+      setDepartments(depts);
+      setCategories(cats);
+    } catch (err) {
+      console.error("Error loading org configuration: ", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchEmployees = async () => {
+    try {
+      const result = await organizationService.getEmployees({
+        search: employeeSearch,
+        role: employeeRoleFilter,
+        page: empPage,
+        limit: empLimit,
+      });
+      setEmployees(result.employees);
+      setTotalEmployees(result.total);
+    } catch (err) {
+      console.error("Error loading employees: ", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [employeeSearch, employeeRoleFilter, empPage]);
+
+  // Filtered Departments (client-side search for simplicity as backend might not have search parameter for departments)
   const filteredDepartments = useMemo(() => {
-    return orgData.departments.filter((dept) => {
+    return departments.filter((dept) => {
       const q = deptSearch.toLowerCase().trim();
       return (
         !q ||
         dept.name.toLowerCase().includes(q) ||
-        dept.head.toLowerCase().includes(q)
+        (dept.head && dept.head.toLowerCase().includes(q))
       );
     });
-  }, [deptSearch]);
+  }, [departments, deptSearch]);
 
   // Filtered Categories
   const filteredCategories = useMemo(() => {
-    return orgData.categories.filter((cat) => {
+    return categories.filter((cat) => {
       const q = categorySearch.toLowerCase().trim();
       return !q || cat.name.toLowerCase().includes(q);
     });
-  }, [categorySearch]);
-
-  // Filtered Employees
-  const filteredEmployees = useMemo(() => {
-    return orgData.employees.filter((emp) => {
-      const q = employeeSearch.toLowerCase().trim();
-      const roleMatch = !employeeRoleFilter || emp.role === employeeRoleFilter;
-      const textMatch =
-        !q ||
-        emp.name.toLowerCase().includes(q) ||
-        emp.email.toLowerCase().includes(q) ||
-        emp.phone.toLowerCase().includes(q) ||
-        emp.department.toLowerCase().includes(q);
-
-      return roleMatch && textMatch;
-    });
-  }, [employeeSearch, employeeRoleFilter]);
-
-  // Paginated Employees
-  const paginatedEmployees = useMemo(() => {
-    const startIndex = (empPage - 1) * empLimit;
-    return filteredEmployees.slice(startIndex, startIndex + empLimit);
-  }, [filteredEmployees, empPage]);
-
-  // Reset pagination when employee search changes
-  useEffect(() => {
-    setEmpPage(1);
-  }, [employeeSearch, employeeRoleFilter]);
+  }, [categories, categorySearch]);
 
   // Tab Switch handler
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
     if (!isMobile) {
-      // Smooth scroll to card on desktop
       const refMap = {
         Departments: deptsRef,
         'Asset Categories': categoriesRef,
@@ -115,6 +133,15 @@ export default function OrganizationSetupPage() {
   const handleAddCategory = () => setShowCategoryModal(true);
   const handleAddEmployee = () => setShowEmployeeModal(true);
 
+  const onAddCategorySubmit = async (data) => {
+    try {
+      await organizationService.upsertCategory(data);
+      await fetchAllData();
+    } catch (err) {
+      console.error('Failed to add category', err);
+    }
+  };
+
   const handleEdit = (section, id) => {
     alert(`Editing item ID ${id} in ${section}`);
   };
@@ -128,7 +155,7 @@ export default function OrganizationSetupPage() {
       {showCategoryModal && (
         <AddCategoryModal
           onClose={() => setShowCategoryModal(false)}
-          onAdd={(data) => console.log('New category:', data)}
+          onAdd={onAddCategorySubmit}
         />
       )}
       {showEmployeeModal && (
@@ -274,7 +301,7 @@ export default function OrganizationSetupPage() {
               />
               <div className="flex-1 min-h-[220px]">
                 <EmployeeTable
-                  employees={paginatedEmployees}
+                  employees={employees}
                   onEdit={(id) => handleEdit('employees', id)}
                   onDelete={(id) => handleDelete('employees', id)}
                 />
@@ -283,7 +310,7 @@ export default function OrganizationSetupPage() {
               {/* Pagination block */}
               <div className="mt-4 pt-4 border-t border-[#F3F4F6]">
                 <Pagination
-                  totalItems={filteredEmployees.length}
+                  totalItems={totalEmployees}
                   itemsPerPage={empLimit}
                   currentPage={empPage}
                   onPageChange={setEmpPage}

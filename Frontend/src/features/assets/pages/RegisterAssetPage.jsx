@@ -11,11 +11,19 @@ import DatePicker from '../components/DatePicker';
 import UploadCard from '../components/UploadCard';
 import FormActions from '../components/FormActions';
 
-import assetData from '../data/data.json';
+import { organizationService } from '../../organization/services/organizationService';
+import { assetService } from '../services/assetService';
 
 export default function RegisterAssetPage() {
   const navigate = useNavigate();
   const [imageFile, setImageFile] = useState(null);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    organizationService.getCategories()
+      .then(setCategories)
+      .catch(err => console.error("Error fetching categories:", err));
+  }, []);
 
   // Initialize React Hook Form
   const {
@@ -43,14 +51,16 @@ export default function RegisterAssetPage() {
   });
 
   // Watch category to dynamically load subCategories options
-  const selectedCategoryName = watch('category');
+  const selectedCategoryId = watch('category'); // backend expects ID usually, or name based on mapping
   const watchedDescription = watch('description') || '';
 
   const subCategoryOptions = useMemo(() => {
-    if (!selectedCategoryName) return [];
-    const cat = assetData.categories.find((c) => c.name === selectedCategoryName);
-    return cat ? cat.subCategories : [];
-  }, [selectedCategoryName]);
+    // If the UI expects string, we just provide empty array or handle it if categories have subcategories
+    if (!selectedCategoryId) return [];
+    const cat = categories.find((c) => String(c.id) === String(selectedCategoryId) || c.name === selectedCategoryId);
+    // Use fallback to assetData if not provided from backend, or assume backend doesn't support subcategories natively yet
+    return cat?.subCategories || assetData.categories.find(c => c.name === selectedCategoryId)?.subCategories || [];
+  }, [selectedCategoryId, categories]);
 
   const handleCancel = () => {
     navigate('/assets/directory');
@@ -62,9 +72,20 @@ export default function RegisterAssetPage() {
     alert('Asset successfully saved as draft! Check console logs.');
   };
 
-  const onSubmit = (data) => {
-    console.log('Submitted Asset Information (Step 1):', { ...data, imageFile });
-    alert('Validation passed for Step 1! Form data logged to console. Ready to proceed to Step 2.');
+  const onSubmit = async (data) => {
+    try {
+      const payload = {
+        ...data,
+        purchaseCost: parseFloat(data.purchaseCost),
+        categoryId: data.category, // map if needed
+      };
+      await assetService.registerAsset(payload);
+      alert('Asset registered successfully!');
+      navigate('/assets/directory');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to register asset. Check console for details.');
+    }
   };
 
   return (
@@ -131,16 +152,16 @@ export default function RegisterAssetPage() {
                       label="Category"
                       placeholder="Select category"
                       required
-                      options={assetData.categories.map((c) => c.name)}
+                      options={categories.map((c) => ({ label: c.name, value: c.id })) || []}
                       error={errors.category}
                       {...register('category', { required: 'Category is required' })}
                     />
 
                     <FormSelect
                       label="Sub Category"
-                      placeholder={selectedCategoryName ? 'Select sub category' : 'Select category first'}
+                      placeholder={selectedCategoryId ? 'Select sub category' : 'Select category first'}
                       options={subCategoryOptions}
-                      disabled={!selectedCategoryName}
+                      disabled={!selectedCategoryId}
                       error={errors.subCategory}
                       {...register('subCategory')}
                     />

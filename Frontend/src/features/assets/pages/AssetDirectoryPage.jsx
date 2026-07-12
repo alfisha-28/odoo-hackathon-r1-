@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import AssetStats from '../components/AssetStats';
@@ -7,6 +7,7 @@ import AssetTable from '../components/AssetTable';
 import Pagination from '../components/Pagination';
 
 import assetData from '../data/data.json';
+import { assetService } from '../services/assetService';
 
 export default function AssetDirectoryPage() {
   const navigate = useNavigate();
@@ -28,11 +29,41 @@ export default function AssetDirectoryPage() {
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  
+  // Data State
+  const [assets, setAssets] = useState([]);
+  const [totalAssets, setTotalAssets] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // Reset page when filter queries change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, selectedStatus, selectedDepartment, selectedLocation]);
+
+  const fetchAssets = async () => {
+    setLoading(true);
+    try {
+      const data = await assetService.getAssets({
+        search: searchQuery,
+        status: selectedStatus,
+        categoryId: selectedCategory, // Note: backend expects IDs if possible, but adjust if it uses names
+        departmentId: selectedDepartment,
+        location: selectedLocation,
+        page: currentPage,
+        limit: itemsPerPage
+      });
+      setAssets(data.assets);
+      setTotalAssets(data.total);
+    } catch (err) {
+      console.error('Failed to load assets', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAssets();
+  }, [searchQuery, selectedCategory, selectedStatus, selectedDepartment, selectedLocation, currentPage, itemsPerPage]);
 
   // Handle filter resets
   const handleResetFilters = () => {
@@ -44,56 +75,6 @@ export default function AssetDirectoryPage() {
     setSelectedIds([]);
   };
 
-  // Perform filtering
-  const filteredAssets = useMemo(() => {
-    return assetData.assets.filter((asset) => {
-      // Search text query
-      const query = searchQuery.toLowerCase().trim();
-      const matchesSearch =
-        !query ||
-        asset.name.toLowerCase().includes(query) ||
-        asset.tag.toLowerCase().includes(query) ||
-        asset.serialNumber.toLowerCase().includes(query);
-
-      // Dropdown filters
-      const matchesCategory = !selectedCategory || asset.category === selectedCategory;
-      const matchesStatus = !selectedStatus || asset.status === selectedStatus;
-      const matchesDepartment = !selectedDepartment || asset.department === selectedDepartment;
-      const matchesLocation = !selectedLocation || asset.location === selectedLocation;
-
-      return (
-        matchesSearch &&
-        matchesCategory &&
-        matchesStatus &&
-        matchesDepartment &&
-        matchesLocation
-      );
-    });
-  }, [searchQuery, selectedCategory, selectedStatus, selectedDepartment, selectedLocation]);
-
-  // Perform sorting
-  const sortedAssets = useMemo(() => {
-    const sorted = [...filteredAssets];
-    if (!sortKey) return sorted;
-
-    sorted.sort((a, b) => {
-      const valA = String(a[sortKey] || '').toLowerCase();
-      const valB = String(b[sortKey] || '').toLowerCase();
-
-      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    return sorted;
-  }, [filteredAssets, sortKey, sortDirection]);
-
-  // Slice paginated items
-  const paginatedAssets = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return sortedAssets.slice(startIndex, startIndex + itemsPerPage);
-  }, [sortedAssets, currentPage, itemsPerPage]);
-
   // Row selection actions
   const handleToggleSelect = (id) => {
     setSelectedIds((prev) =>
@@ -102,14 +83,12 @@ export default function AssetDirectoryPage() {
   };
 
   const handleToggleSelectAll = () => {
-    const currentPageIds = paginatedAssets.map((asset) => asset.id);
+    const currentPageIds = assets.map((asset) => asset.id);
     const allCurrentPageSelected = currentPageIds.every((id) => selectedIds.includes(id));
 
     if (allCurrentPageSelected) {
-      // Deselect page items
       setSelectedIds((prev) => prev.filter((id) => !currentPageIds.includes(id)));
     } else {
-      // Select page items
       setSelectedIds((prev) => {
         const unique = new Set([...prev, ...currentPageIds]);
         return Array.from(unique);
@@ -198,21 +177,25 @@ export default function AssetDirectoryPage() {
 
       {/* Data Table */}
       <section className="flex flex-col gap-4">
-        <AssetTable
-          assets={paginatedAssets}
-          selectedIds={selectedIds}
-          onToggleSelect={handleToggleSelect}
-          onToggleSelectAll={handleToggleSelectAll}
-          onSort={handleSort}
-          sortConfig={{ key: sortKey, direction: sortDirection }}
-          onView={handleViewAsset}
-          onEdit={handleEditAsset}
-          onMore={handleMoreAsset}
-        />
+        {loading ? (
+          <div className="flex items-center justify-center h-32 text-gray-500 font-semibold">Loading...</div>
+        ) : (
+          <AssetTable
+            assets={assets}
+            selectedIds={selectedIds}
+            onToggleSelect={handleToggleSelect}
+            onToggleSelectAll={handleToggleSelectAll}
+            onSort={handleSort}
+            sortConfig={{ key: sortKey, direction: sortDirection }}
+            onView={handleViewAsset}
+            onEdit={handleEditAsset}
+            onMore={handleMoreAsset}
+          />
+        )}
 
         {/* Pagination Controls */}
         <Pagination
-          totalItems={filteredAssets.length}
+          totalItems={totalAssets}
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}
           onPageChange={setCurrentPage}

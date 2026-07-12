@@ -7,6 +7,7 @@ import ActionButtons from './ActionButtons';
 const headers = [
   'Category Name',
   { label: 'Assets', align: 'left' },
+  'Custom Fields',
   'Status',
   { label: 'Actions', align: 'right', width: '90px' },
 ];
@@ -29,12 +30,17 @@ export default function CategoryTable({ categories = [], onEdit, onDelete }) {
 
       {/* Assets Count */}
       <td className="py-3.5 px-4 align-middle text-xs font-black text-[#475569]">
-        {cat.assets}
+        {cat.assets || 0}
+      </td>
+
+      {/* Custom Fields */}
+      <td className="py-3.5 px-4 align-middle text-[10px] text-gray-500 max-w-[200px] truncate">
+        {cat.customFields ? JSON.stringify(cat.customFields) : 'None'}
       </td>
 
       {/* Status */}
       <td className="py-3.5 px-4 align-middle">
-        <StatusBadge status={cat.status} />
+        <StatusBadge status={cat.status || 'ACTIVE'} />
       </td>
 
       {/* Actions */}

@@ -1,4 +1,5 @@
 import reportsData from '../data/data.json';
+import apiClient from '../../../shared/services/apiClient';
 
 /**
  * Service to simulate async API calls for Reports & Analytics module
@@ -24,14 +25,6 @@ export const reportsService = {
 
   getAssetUtilization: async (startDate, endDate) => {
     await new Promise((resolve) => setTimeout(resolve, 400));
-    if (startDate || endDate) {
-      // Simulate slightly lower utilization on date filter
-      return reportsData.assetUtilization.map((item) => ({
-        ...item,
-        inUse: Math.round(item.inUse * 0.92),
-        available: Math.round(item.available * 1.05),
-      }));
-    }
     return reportsData.assetUtilization;
   },
 
@@ -41,37 +34,50 @@ export const reportsService = {
   },
 
   getDepartmentAllocation: async (startDate, endDate) => {
-    await new Promise((resolve) => setTimeout(resolve, 450));
+    await new Promise((resolve) => setTimeout(resolve, 350));
     return reportsData.departmentAllocation;
   },
 
   getMaintenanceTrend: async (startDate, endDate) => {
     await new Promise((resolve) => setTimeout(resolve, 450));
-    if (startDate || endDate) {
-      // Simulate filtering the trend dates
-      return reportsData.maintenanceTrend.map((item) => ({
-        ...item,
-        created: Math.round(item.created * 0.9),
-        resolved: Math.round(item.resolved * 0.92),
-      }));
-    }
     return reportsData.maintenanceTrend;
   },
 
   getCategoryUtilization: async (startDate, endDate) => {
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    await new Promise((resolve) => setTimeout(resolve, 300));
     return reportsData.categoryUtilization;
   },
 
   getReportTypes: async () => {
+    await new Promise((resolve) => setTimeout(resolve, 200));
     return reportsData.reportTypes;
   },
 
   getFrequencies: async () => {
+    await new Promise((resolve) => setTimeout(resolve, 200));
     return reportsData.frequencies;
   },
 
   getRecipients: async () => {
-    return reportsData.recipients;
-  }
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    return reportsData.recipientsList;
+  },
+
+  getDashboardKPIs: async () => {
+    try {
+      const response = await apiClient.get('/dashboard/kpis');
+      return response.data.data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  getAnalyticsData: async () => {
+    try {
+      const response = await apiClient.get('/dashboard/analytics');
+      return response.data.data;
+    } catch (e) {
+      return null;
+    }
+  },
 };

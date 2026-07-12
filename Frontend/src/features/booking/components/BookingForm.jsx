@@ -55,16 +55,31 @@ export default function BookingForm({ prefilledType, onCancel, onSaveDraft, onSu
     }));
   }, []);
 
+  // Fetch bookable assets from API
+  const [bookableAssets, setBookableAssets] = useState([]);
+  
+  useEffect(() => {
+    import('../../assets/services/assetService').then(({ assetService }) => {
+      assetService.getAssets({ isBookable: true })
+        .then(data => setBookableAssets(data.assets || data.data || []))
+        .catch(err => console.error('Failed to fetch bookable assets:', err));
+    });
+  }, []);
+
   // Filter resources based on selected type
   const filteredResourceOptions = useMemo(() => {
     if (!resourceType) return [];
-    return bookingData.resources
-      .filter((res) => res.type === resourceType)
-      .map((res) => ({
+    
+    // Attempt to map from fetched API assets first, fallback to static if empty
+    const assetsSource = bookableAssets.length > 0 
+      ? bookableAssets.filter(a => a.category === resourceType || a.name.includes(resourceType)) // basic fallback matching
+      : bookingData.resources.filter((res) => res.type === resourceType);
+      
+    return assetsSource.map((res) => ({
         value: res.id,
-        label: `${res.name} (${res.location})`,
+        label: `${res.name} (${res.location || 'Unknown'})`,
       }));
-  }, [resourceType]);
+  }, [resourceType, bookableAssets]);
 
   // Load employees options
   const employeeOptions = useMemo(() => {

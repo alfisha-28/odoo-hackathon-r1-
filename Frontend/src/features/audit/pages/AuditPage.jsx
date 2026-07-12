@@ -99,89 +99,100 @@ export default function AuditPage() {
   }, [detailsAuditId, audits]);
 
   // Handle checking/unchecking checklist items in details modal
-  const handleToggleChecklistItem = (itemId) => {
-    setAudits((prevAudits) =>
-      prevAudits.map((aud) => {
-        if (aud.id !== detailsAuditId) return aud;
-        
-        const updatedChecklist = aud.checklist.map((item) => {
-          if (item.id !== itemId) return item;
-          return { ...item, completed: !item.completed };
-        });
+  const handleToggleChecklistItem = async (itemId) => {
+    // Determine the result based on UI or some standard logic - toggling between Verified / Missing
+    const result = window.prompt("Verify Asset - Enter result (VERIFIED, MISSING, DAMAGED):", "VERIFIED");
+    if (!result) return;
 
-        // Recompute findings count
-        const passed = updatedChecklist.filter((item) => item.completed).length;
-        const failed = updatedChecklist.length - passed;
+    try {
+      await auditService.verifyAsset(detailsAuditId, { assetId: itemId, result: result.toUpperCase(), notes: 'Verified via dashboard' });
+      
+      // Update local state to reflect UI change
+      setAudits((prevAudits) =>
+        prevAudits.map((aud) => {
+          if (aud.id !== detailsAuditId) return aud;
+          
+          const updatedChecklist = aud.checklist.map((item) => {
+            if (item.id !== itemId) return item;
+            return { ...item, completed: result.toUpperCase() === 'VERIFIED' };
+          });
 
-        return {
-          ...aud,
-          checklist: updatedChecklist,
-          findings: {
-            ...aud.findings,
-            passed,
-            failed: aud.status === 'Completed' ? failed : 0,
-          },
-        };
-      })
-    );
+          // Recompute findings count
+          const passed = updatedChecklist.filter((item) => item.completed).length;
+          const failed = updatedChecklist.length - passed;
+
+          return {
+            ...aud,
+            checklist: updatedChecklist,
+            findings: {
+              ...aud.findings,
+              passed,
+              failed: aud.status === 'Completed' ? failed : 0,
+            },
+          };
+        })
+      );
+    } catch (err) {
+      alert("Failed to verify asset.");
+    }
   };
 
   // Handle completing an audit from details modal
-  const handleCompleteAudit = (auditId) => {
-    setAudits((prevAudits) =>
-      prevAudits.map((aud) => {
-        if (aud.id !== auditId) return aud;
-        
-        const totalItems = aud.checklist?.length || 0;
-        const passed = aud.checklist?.filter((item) => item.completed).length || 0;
-        const failed = totalItems - passed;
+  const handleCompleteAudit = async (auditId) => {
+    try {
+      await auditService.closeAuditCycle(auditId);
+      
+      setAudits((prevAudits) =>
+        prevAudits.map((aud) => {
+          if (aud.id !== auditId) return aud;
+          
+          const totalItems = aud.checklist?.length || 0;
+          const passed = aud.checklist?.filter((item) => item.completed).length || 0;
+          const failed = totalItems - passed;
 
-        // Add submitted timeline item
-        const now = new Date();
-        const formattedDate = `${now.getDate()} May 2025`; // Mocked timestamp
-
-        const updatedTimeline = [...(aud.timeline || [])];
-        if (!updatedTimeline.some(t => t.title === 'Checklist Completed')) {
-          updatedTimeline.push({ title: 'Checklist Completed', time: formattedDate });
-        }
-        if (!updatedTimeline.some(t => t.title === 'Audit Submitted')) {
-          updatedTimeline.push({ title: 'Audit Submitted', time: formattedDate });
-        }
-
-        return {
-          ...aud,
-          status: 'Completed',
-          findings: {
-            passed,
-            failed,
-            warnings: aud.findings?.warnings || 0,
-          },
-          timeline: updatedTimeline,
-        };
-      })
-    );
-    alert(`Audit ${auditId} has been successfully Completed.`);
+          return {
+            ...aud,
+            status: 'Completed',
+            findings: {
+              passed,
+              failed,
+              warnings: aud.findings?.warnings || 0,
+            },
+          };
+        })
+      );
+      alert(`Audit ${auditId} has been successfully closed.`);
+    } catch (err) {
+      alert("Failed to close audit.");
+    }
   };
 
   // Handle creating a new audit scheduler submission
-  const handleNewAuditSubmit = (newAuditData) => {
-    const nextIdNumber = audits.length > 0 
-      ? Math.max(...audits.map((a) => parseInt(a.id.split('-')[2]))) + 1 
-      : 29;
-    
-    const formattedId = `AU-2025-00${nextIdNumber}`;
-    const newAudit = {
-      id: formattedId,
-      status: 'Scheduled',
-      findings: { passed: 0, failed: 0, warnings: 0 },
-      timeline: [{ title: 'Audit Scheduled', time: '15 May 2025' }],
-      ...newAuditData,
-    };
+  const handleNewAuditSubmit = async (newAuditData) => {
+    try {
+      const createdCycle = await auditService.startAuditCycle({
+        name: newAuditData.name,
+        scopeDepartmentId: newAuditData.department || 'ALL',
+        scopeLocation: newAuditData.location || 'ALL',
+        startDate: newAuditData.scheduledOn,
+        endDate: newAuditData.deadline,
+        auditorIds: ['USR-001'] // Simulated
+      });
 
-    setAudits((prev) => [newAudit, ...prev]);
-    setNewAuditOpen(false);
-    console.log('Successfully scheduled new audit:', newAudit);
-    alert(`Successfully scheduled new audit: ${newAudit.name} (${newAudit.id})`);
+      const newAudit = {
+        id: createdCycle?.id || `AU-2025-00${audits.length + 30}`,
+        status: 'Scheduled',
+        findings: { passed: 0, failed: 0, warnings: 0 },
+        timeline: [{ title: 'Audit Scheduled', time: '15 May 2025' }],
+        ...newAuditData,
+      };
+
+      setAudits((prev) => [newAudit, ...prev]);
+      setNewAuditOpen(false);
+      alert(`Successfully scheduled new audit: ${newAudit.name} (${newAudit.id})`);
+    } catch (err) {
+      alert("Failed to schedule audit.");
+    }
   };
 
   // Handle saving as draft

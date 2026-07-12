@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StatCard from '../components/StatCard';
 import QuickActionCard from '../components/QuickActionCard';
@@ -14,6 +14,42 @@ import dashboardData from '../data/data.json';
 export default function DashboardPage() {
   const navigate = useNavigate();
   const greetingName = "John"; // Default fallback
+
+  const [stats, setStats] = useState(dashboardData.stats);
+  const [assetStatus, setAssetStatus] = useState(dashboardData.assetStatus);
+  const [monthlyAllocation, setMonthlyAllocation] = useState(dashboardData.monthlyAllocation);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { reportsService } = await import('../../reports/services/reportsService');
+        const [kpis, analytics] = await Promise.all([
+          reportsService.getDashboardKPIs(),
+          reportsService.getAnalyticsData(),
+        ]);
+        
+        // Merge fetched KPI data into stats cards
+        if (kpis) {
+          setStats(prev => prev.map(s => {
+            if (s.title === 'Total Assets' && kpis.totalAssets !== undefined) return { ...s, value: kpis.totalAssets.toString() };
+            if (s.title === 'Assets Available' && kpis.assetsAvailable !== undefined) return { ...s, value: kpis.assetsAvailable.toString() };
+            if (s.title === 'Assets Allocated' && kpis.assetsAllocated !== undefined) return { ...s, value: kpis.assetsAllocated.toString() };
+            if (s.title === 'Under Maintenance' && kpis.underMaintenance !== undefined) return { ...s, value: kpis.underMaintenance.toString() };
+            if (s.title === 'Overdue Returns' && kpis.overdueReturns !== undefined) return { ...s, value: kpis.overdueReturns.toString() };
+            return s;
+          }));
+        }
+
+        if (analytics) {
+          if (analytics.assetStatus) setAssetStatus(analytics.assetStatus);
+          if (analytics.monthlyAllocation) setMonthlyAllocation(analytics.monthlyAllocation);
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleQuickAction = (actionTitle) => {
     if (actionTitle === 'Register Asset') {
@@ -44,7 +80,7 @@ export default function DashboardPage() {
 
       {/* Statistics Grid */}
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        {dashboardData.stats.map((stat) => (
+        {stats.map((stat) => (
           <StatCard
             key={stat.id}
             title={stat.title}
@@ -85,12 +121,12 @@ export default function DashboardPage() {
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Asset Status Donut Chart */}
         <div className="lg:col-span-1 min-h-[340px]">
-          <AssetStatusChart data={dashboardData.assetStatus} />
+          <AssetStatusChart data={assetStatus} />
         </div>
 
         {/* Monthly Allocation Bar Chart */}
         <div className="lg:col-span-1 min-h-[340px]">
-          <MonthlyAllocationChart data={dashboardData.monthlyAllocation} />
+          <MonthlyAllocationChart data={monthlyAllocation} />
         </div>
 
         {/* Recent Activity Timeline */}

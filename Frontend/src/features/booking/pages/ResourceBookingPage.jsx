@@ -17,8 +17,8 @@ import BookingDetailsModal from '../components/BookingDetailsModal';
 import bookingData from '../data/data.json';
 
 export default function ResourceBookingPage() {
-  // Primary state list
-  const [bookings, setBookings] = useState(bookingData.bookings);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Modal controls
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
@@ -40,6 +40,24 @@ export default function ResourceBookingPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  const fetchBookings = async () => {
+    setLoading(true);
+    try {
+      const { bookingService } = await import('../services/bookingService');
+      const data = await bookingService.getBookings(); // Fetch all bookings initially
+      setBookings(data || []);
+    } catch (err) {
+      console.error('Failed to fetch bookings:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  import { useEffect } from 'react';
+  useEffect(() => {
+    fetchBookings();
+  }, []);
+
   // Compute dynamic stats based on current bookings state
   const computedStats = useMemo(() => {
     const upcoming = bookings.filter((b) => b.status === 'Approved').length;
@@ -51,7 +69,7 @@ export default function ResourceBookingPage() {
       {
         id: 'stat-upcoming',
         title: 'Upcoming Bookings',
-        value: upcoming + 18, // Seed values for fidelity
+        value: upcoming, 
         subtitle: 'Next 7 Days',
         icon: 'CalendarDays',
         color: 'indigo',
@@ -98,7 +116,7 @@ export default function ResourceBookingPage() {
   const filteredBookings = useMemo(() => {
     return bookings.filter((item) => {
       // 1. Tabs filter
-      if (activeTab === 'My Bookings' && item.employee.name !== 'John Doe') return false;
+      if (activeTab === 'My Bookings' && item.employee?.name !== 'John Doe') return false;
       if (activeTab === 'Pending Approval' && item.status !== 'Pending') return false;
       if (activeTab === 'Approved' && item.status !== 'Approved') return false;
       if (activeTab === 'Cancelled' && item.status !== 'Cancelled') return false;
@@ -113,15 +131,15 @@ export default function ResourceBookingPage() {
       // 3. Search query (ID, Resource Name, Employee Name)
       if (searchQuery) {
         const q = searchQuery.toLowerCase().trim();
-        const matchesId = item.id.toLowerCase().includes(q);
-        const matchesResource = item.resource.name.toLowerCase().includes(q);
-        const matchesEmployee = item.employee.name.toLowerCase().includes(q);
+        const matchesId = item.id?.toLowerCase().includes(q);
+        const matchesResource = item.resource?.name?.toLowerCase().includes(q);
+        const matchesEmployee = item.employee?.name?.toLowerCase().includes(q);
         if (!matchesId && !matchesResource && !matchesEmployee) return false;
       }
 
       // 4. Dropdowns type, location, status
-      if (selectedType && item.resource.type !== selectedType) return false;
-      if (selectedLocation && item.resource.location !== selectedLocation) return false;
+      if (selectedType && item.resource?.type !== selectedType) return false;
+      if (selectedLocation && item.resource?.location !== selectedLocation) return false;
       if (selectedStatus && item.status !== selectedStatus) return false;
 
       // 5. Date ranges
@@ -188,28 +206,29 @@ export default function ResourceBookingPage() {
   };
 
   // New Booking submission
-  const handleNewBookingSubmit = (formData) => {
-    console.log('Confirm Booking Form Values:', formData);
+  const handleNewBookingSubmit = async (formData) => {
+    try {
+      const { bookingService } = await import('../services/bookingService');
+      const payload = {
+        assetId: formData.resourceId,
+        startTime: `${formData.bookingDate}T${formData.startTime}:00`,
+        endTime: `${formData.bookingDate}T${formData.endTime}:00`,
+        purpose: formData.purpose,
+      };
 
-    const newId = `BK-2025-00${57 + bookings.length}`;
-    const newBooking = {
-      id: newId,
-      resource: formData.resource,
-      employee: formData.employee,
-      date: formData.bookingDate,
-      startTime: formData.startTime,
-      endTime: formData.endTime,
-      purpose: formData.purpose,
-      status: 'Approved', // Auto-approved on mock submission
-      priority: formData.priority,
-      notes: formData.notes,
-      attachment: formData.attachment,
-    };
-
-    setBookings((prev) => [newBooking, ...prev]);
-    setIsNewModalOpen(false);
-    setQuickBookPrefilledType('');
-    alert(`Resource Booking ${newId} confirmed successfully!`);
+      await bookingService.createBooking(payload);
+      
+      setIsNewModalOpen(false);
+      setQuickBookPrefilledType('');
+      alert(`Resource booked successfully!`);
+      fetchBookings(); // Refresh bookings grid
+    } catch (err) {
+      if (err.response?.status === 409) {
+        alert("Error: The selected time slot overlaps with an existing booking.");
+      } else {
+        alert(err.response?.data?.message || "Failed to create booking.");
+      }
+    }
   };
 
   const handleSaveDraft = (draftData) => {
@@ -220,13 +239,17 @@ export default function ResourceBookingPage() {
   };
 
   // Cancel Booking action inside Details modal
-  const handleCancelBookingAction = (id) => {
-    setBookings((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: 'Cancelled' } : b))
-    );
-    setIsDetailsModalOpen(false);
-    setSelectedBooking(null);
-    alert(`Booking ${id} has been cancelled.`);
+  const handleCancelBookingAction = async (id) => {
+    try {
+      const { bookingService } = await import('../services/bookingService');
+      await bookingService.updateBooking(id, { status: 'CANCELLED' });
+      alert(`Booking ${id} has been cancelled.`);
+      setIsDetailsModalOpen(false);
+      setSelectedBooking(null);
+      fetchBookings();
+    } catch (err) {
+      alert("Failed to cancel booking.");
+    }
   };
 
   // Edit Booking action inside Details modal

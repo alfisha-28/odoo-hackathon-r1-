@@ -18,38 +18,48 @@ const getInitialLanguage = () => {
   return 'EN';
 };
 
+const getInitialUser = () => {
+  if (typeof window !== 'undefined') {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  }
+  return null;
+};
+
+const getInitialAuth = () => {
+  if (typeof window !== 'undefined') {
+    return !!localStorage.getItem('token');
+  }
+  return false;
+};
+
 export const useAuthStore = create((set) => ({
-  isAuthenticated: true,
-  user: {
-    id: 'usr_flowsync_001',
-    name: 'John Doe',
-    email: 'john.doe@assetflow.com',
-    avatar: null,
-    role: 'Asset Manager',
-    department: 'Operations & IT',
-  },
+  isAuthenticated: getInitialAuth(),
+  user: getInitialUser(),
   theme: getInitialTheme(),
   language: getInitialLanguage(),
 
-  login: (userData) => {
-    localStorage.setItem('token', 'mock-jwt-token-xyz');
+  login: (userData, token) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
     set({ isAuthenticated: true, user: userData });
   },
 
   register: (userData) => {
-    localStorage.setItem('token', 'mock-jwt-token-xyz');
-    set({ isAuthenticated: true, user: userData });
+    // If registration automatically logs user in or requires manual log in,
+    // handle it here. Otherwise redirect them.
+    set({ user: userData });
   },
 
   logout: () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     set({ isAuthenticated: false, user: null });
   },
 
   toggleTheme: () => set((state) => {
     const nextTheme = state.theme === 'light' ? 'dark' : 'light';
     localStorage.setItem('theme', nextTheme);
-    // Apply dark class to documentElement
     if (nextTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
