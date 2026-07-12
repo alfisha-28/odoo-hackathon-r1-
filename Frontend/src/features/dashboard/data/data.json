@@ -1,0 +1,191 @@
+{
+  "stats": [
+    {
+      "id": "stat-1",
+      "title": "Available Assets",
+      "value": 120,
+      "change": 12,
+      "isPositive": true,
+      "icon": "Package",
+      "color": "green"
+    },
+    {
+      "id": "stat-2",
+      "title": "Allocated Assets",
+      "value": 75,
+      "change": 5,
+      "isPositive": true,
+      "icon": "User",
+      "color": "blue"
+    },
+    {
+      "id": "stat-3",
+      "title": "Under Maintenance",
+      "value": 6,
+      "change": 14,
+      "isPositive": false,
+      "icon": "Tool",
+      "color": "orange"
+    },
+    {
+      "id": "stat-4",
+      "title": "Active Bookings",
+      "value": 18,
+      "change": 8,
+      "isPositive": true,
+      "icon": "Calendar",
+      "color": "purple"
+    },
+    {
+      "id": "stat-5",
+      "title": "Pending Transfers",
+      "value": 3,
+      "change": 25,
+      "isPositive": false,
+      "icon": "ArrowLeftRight",
+      "color": "red"
+    },
+    {
+      "id": "stat-6",
+      "title": "Upcoming Returns",
+      "value": 12,
+      "change": 15,
+      "isPositive": true,
+      "icon": "RotateCcw",
+      "color": "green"
+    }
+  ],
+  "assetStatus": [
+    { "name": "Available", "value": 120, "percentage": 54.8, "color": "#16A34A" },
+    { "name": "Allocated", "value": 75, "percentage": 34.2, "color": "#3B82F6" },
+    { "name": "Under Maintenance", "value": 6, "percentage": 2.7, "color": "#F59E0B" },
+    { "name": "Lost", "value": 2, "percentage": 0.9, "color": "#EF4444" },
+    { "name": "Retired", "value": 5, "percentage": 2.3, "color": "#8B5CF6" },
+    { "name": "Disposed", "value": 11, "percentage": 5.1, "color": "#6B7280" }
+  ],
+  "monthlyAllocation": [
+    { "name": "Jan", "allocations": 50 },
+    { "name": "Feb", "allocations": 75 },
+    { "name": "Mar", "allocations": 62 },
+    { "name": "Apr", "allocations": 75 },
+    { "name": "May", "allocations": 105 },
+    { "name": "Jun", "allocations": 118 }
+  ],
+  "recentActivities": [
+    {
+      "id": "act-1",
+      "title": "Laptop AF-0147 allocated to Priya Shah",
+      "subtitle": "IT Department",
+      "time": "10:30 AM",
+      "status": "success",
+      "icon": "Laptop"
+    },
+    {
+      "id": "act-2",
+      "title": "Room B2 booked by Karan Mehta",
+      "subtitle": "2:00 PM - 3:00 PM",
+      "time": "10:15 AM",
+      "status": "purple",
+      "icon": "Calendar"
+    },
+    {
+      "id": "act-3",
+      "title": "Projector AF-0082 maintenance approved",
+      "subtitle": "Maintenance Team",
+      "time": "09:45 AM",
+      "status": "warning",
+      "icon": "Tool"
+    },
+    {
+      "id": "act-4",
+      "title": "Transfer request for AF-0089 approved",
+      "subtitle": "By Sarah Johnson",
+      "time": "Yesterday, 04:20 PM",
+      "status": "info",
+      "icon": "ArrowLeftRight"
+    },
+    {
+      "id": "act-5",
+      "title": "Chair AF-0032 marked as missing in audit",
+      "subtitle": "Audit Cycle AC-2025-03",
+      "time": "Yesterday, 02:10 PM",
+      "status": "danger",
+      "icon": "AlertTriangle"
+    }
+  ],
+  "upcomingReturns": [
+    {
+      "id": "ret-1",
+      "assetId": "AF-0147",
+      "assetName": "Laptop Dell",
+      "assignedUser": "Priya Shah",
+      "daysLeft": "Due in 2 days",
+      "dueDate": "18",
+      "dueMonth": "May",
+      "type": "laptop"
+    },
+    {
+      "id": "ret-2",
+      "assetId": "AF-0083",
+      "assetName": "Office Chair",
+      "assignedUser": "Rahul Verma",
+      "daysLeft": "Due in 5 days",
+      "dueDate": "21",
+      "dueMonth": "May",
+      "type": "chair"
+    },
+    {
+      "id": "ret-3",
+      "assetId": "AF-0061",
+      "assetName": "Camera",
+      "assignedUser": "Neha Kapoor",
+      "daysLeft": "Due in 7 days",
+      "dueDate": "23",
+      "dueMonth": "May",
+      "type": "camera"
+    },
+    {
+      "id": "ret-4",
+      "assetId": "AF-0029",
+      "assetName": "Projector",
+      "assignedUser": "Amit Joshi",
+      "daysLeft": "Due in 10 days",
+      "dueDate": "26",
+      "dueMonth": "May",
+      "type": "projector"
+    }
+  ],
+  "quickActions": [
+    {
+      "id": "qa-1",
+      "title": "Register Asset",
+      "subtitle": "Add new asset to system",
+      "icon": "Plus",
+      "color": "green"
+    },
+    {
+      "id": "qa-2",
+      "title": "Book Resource",
+      "subtitle": "Reserve a room or equipment",
+      "icon": "Calendar",
+      "color": "purple"
+    },
+    {
+      "id": "qa-3",
+      "title": "Raise Request",
+      "subtitle": "Maintenance or other request",
+      "icon": "Tool",
+      "color": "orange"
+    }
+  ],
+  "navigation": [
+    { "name": "Dashboard", "icon": "LayoutDashboard", "path": "/dashboard", "count": 0 },
+    { "name": "Assets", "icon": "Package", "path": "/assets", "count": 0, "hasChevron": true },
+    { "name": "Allocation & Transfer", "icon": "ArrowLeftRight", "path": "/allocations", "count": 0, "hasChevron": true },
+    { "name": "Resource Booking", "icon": "Calendar", "path": "/bookings", "count": 0, "hasChevron": true },
+    { "name": "Maintenance", "icon": "Tool", "path": "/maintenance", "count": 0, "hasChevron": true },
+    { "name": "Audit", "icon": "ShieldCheck", "path": "/audit", "count": 0 },
+    { "name": "Reports", "icon": "BarChart3", "path": "/reports", "count": 0 },
+    { "name": "Notifications", "icon": "Bell", "path": "/notifications", "count": 8 }
+  ]
+}

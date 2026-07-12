@@ -19,8 +19,15 @@ const getInitialLanguage = () => {
 };
 
 export const useAuthStore = create((set) => ({
-  isAuthenticated: false,
-  user: null,
+  isAuthenticated: true,
+  user: {
+    id: 'usr_flowsync_001',
+    name: 'John Doe',
+    email: 'john.doe@assetflow.com',
+    avatar: null,
+    role: 'Asset Manager',
+    department: 'Operations & IT',
+  },
   theme: getInitialTheme(),
   language: getInitialLanguage(),
 
