@@ -498,3 +498,98 @@ Authorization: Bearer {{p3AdminToken}}
   "resolutionNotes": "Screen replaced successfully"
 }
 
+###
+### ═════════════════════════════════════════════
+### PHASE 4 — Audits, Dashboard, & Notifications Verification
+### ═════════════════════════════════════════════
+
+### ─────────────────────────────────────────────
+### P4-1. Create an Audit Cycle
+### ─────────────────────────────────────────────
+# @name createAudit
+POST {{baseUrl}}/audits
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "name": "Q3 Engineering Asset Audit",
+  "startDate": "2024-01-01T00:00:00Z",
+  "endDate": "2024-01-31T00:00:00Z",
+  "auditorIds": ["{{targetEmpId}}"]
+}
+
+@auditCycleId = {{createAudit.response.body.data.cycle.id}}
+@auditItem1 = {{createAudit.response.body.data.cycle.items[0].asset.id}}
+@auditItem2 = {{createAudit.response.body.data.cycle.items[1].asset.id}}
+
+### ─────────────────────────────────────────────
+### P4-2. Verify an item as MISSING (simulating the auditor)
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/audits/{{auditCycleId}}
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "action": "VERIFY",
+  "assetId": "{{auditItem1}}",
+  "result": "MISSING",
+  "notes": "Could not find it in the office"
+}
+
+### ─────────────────────────────────────────────
+### P4-3. Verify an item as DAMAGED
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/audits/{{auditCycleId}}
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "action": "VERIFY",
+  "assetId": "{{auditItem2}}",
+  "result": "DAMAGED",
+  "notes": "Screen is completely shattered"
+}
+
+### ─────────────────────────────────────────────
+### P4-4. Close the Audit Cycle (Should cascade MISSING -> LOST)
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/audits/{{auditCycleId}}
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "action": "CLOSE"
+}
+
+### ─────────────────────────────────────────────
+### P4-5. Fetch Dashboard KPIs
+### ─────────────────────────────────────────────
+GET {{baseUrl}}/dashboard/kpis
+Authorization: Bearer {{p3AdminToken}}
+
+### ─────────────────────────────────────────────
+### P4-6. Fetch Dashboard Analytics
+### ─────────────────────────────────────────────
+GET {{baseUrl}}/dashboard/analytics
+Authorization: Bearer {{p3AdminToken}}
+
+### ─────────────────────────────────────────────
+### P4-7. Fetch Notifications for the Auditor
+### ─────────────────────────────────────────────
+# @name getNotifications
+GET {{baseUrl}}/notifications?unreadOnly=true
+Authorization: Bearer {{p3AdminToken}}
+
+@notificationId = {{getNotifications.response.body.data.data[0].id}}
+
+### ─────────────────────────────────────────────
+### P4-8. Bulk Mark Notifications Read
+### ─────────────────────────────────────────────
+PATCH {{baseUrl}}/notifications
+Content-Type: application/json
+Authorization: Bearer {{p3AdminToken}}
+
+{
+  "markAllRead": true
+}
+

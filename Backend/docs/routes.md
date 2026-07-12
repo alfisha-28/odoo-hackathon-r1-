@@ -61,34 +61,41 @@
 
 ---
 
-## Phase 3B — Not yet implemented
+## Phase 3B — Implemented ✅
 
 ### Bookings (`/api/bookings`)
-- `GET /api/bookings` — List bookings
-- `POST /api/bookings` — Book a shared resource
-- `PATCH /api/bookings/:id` — Cancel/reschedule booking
+| Method | Path | Auth | Role | Description |
+|--------|------|------|------|-------------|
+| GET | `/api/bookings` | Bearer JWT | any | List bookings |
+| POST | `/api/bookings` | Bearer JWT | any | Book a shared resource (checks overlap logic) |
+| PATCH | `/api/bookings/:id` | Bearer JWT | ASSET_MANAGER, ADMIN, OWNER | Cancel/reschedule booking |
 
 ### Maintenance (`/api/maintenance`)
-- `GET /api/maintenance` — List maintenance requests
-- `POST /api/maintenance` — Raise maintenance request
-- `PATCH /api/maintenance/:id` — Approve/assign/resolve
+| Method | Path | Auth | Role | Description |
+|--------|------|------|------|-------------|
+| GET | `/api/maintenance` | Bearer JWT | any | List maintenance requests |
+| POST | `/api/maintenance` | Bearer JWT | any | Raise maintenance request |
+| PATCH | `/api/maintenance/:id` | Bearer JWT | ASSET_MANAGER, ADMIN, TECHNICIAN | Approve/assign/resolve state machine |
 
 ---
 
-## Phase 4 — Not yet implemented
+## Phase 4 — Implemented ✅
 
 ### Audits (`/api/audits`)
-- `GET /api/audits` — List audit cycles
-- `POST /api/audits` — Start audit cycle
-- `PATCH /api/audits/:id` — Verify items / close cycle
+| Method | Path | Auth | Role | Description |
+|--------|------|------|------|-------------|
+| GET | `/api/audits` | Bearer JWT | ASSET_MANAGER, ADMIN, AUDITOR | List audit cycles |
+| POST | `/api/audits` | Bearer JWT | ASSET_MANAGER, ADMIN | Create cycle & assignments, auto-populate items |
+| PATCH | `/api/audits/:id` | Bearer JWT | ASSET_MANAGER, ADMIN, AUDITOR | Verify item or Close cycle |
 
-### Dashboard & Analytics (`/api/dashboard`)
-- `GET /api/dashboard/kpis`
-- `GET /api/dashboard/analytics`
+### Dashboard & Reports (`/api/dashboard`)
+| Method | Path | Auth | Role | Description |
+|--------|------|------|------|-------------|
+| GET | `/api/dashboard/kpis` | Bearer JWT | any | Global counts & recent activity for main dashboard |
+| GET | `/api/dashboard/analytics`| Bearer JWT | ASSET_MANAGER, ADMIN | Heavy aggregations (utilization, frequency, top assets) |
 
 ### Notifications (`/api/notifications`)
-- `GET /api/notifications`
-
-### Reports & Uploads
-- `GET /api/reports`
-- `POST /api/uploads`
+| Method | Path | Auth | Role | Description |
+|--------|------|------|------|-------------|
+| GET | `/api/notifications` | Bearer JWT | any | List current user's notifications |
+| PATCH | `/api/notifications` | Bearer JWT | any | Bulk mark notifications as read |

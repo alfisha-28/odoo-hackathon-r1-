@@ -40,4 +40,12 @@ const maintenanceRouter = require('../features/maintenance/maintenance.routes');
 router.use('/bookings', bookingsRouter);
 router.use('/maintenance', maintenanceRouter);
 
+// Phase 4 feature routes
+const auditsRouter = require('../features/audits/audits.routes');
+const dashboardRouter = require('../features/dashboard/dashboard.routes');
+const notificationsRouter = require('../features/notifications/notifications.routes');
+router.use('/audits', auditsRouter);
+router.use('/dashboard', dashboardRouter);
+router.use('/notifications', notificationsRouter);
+
 module.exports = router;
