@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 
 import MaintenanceStats from '../components/MaintenanceStats';
@@ -54,7 +54,6 @@ export default function MaintenancePage() {
     }
   };
 
-  import { useEffect } from 'react';
   useEffect(() => {
     fetchTickets();
   }, [selectedStatus, selectedPriority]);

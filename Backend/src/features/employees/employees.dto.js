@@ -4,8 +4,12 @@ const { paginationSchema } = require('../../common/validators/pagination.dto');
 const listEmployeesSchema = z.object({
   query: paginationSchema.extend({
     search: z.string().optional(),
-    role: z.enum(['ADMIN', 'ASSET_MANAGER', 'DEPARTMENT_HEAD', 'EMPLOYEE']).optional(),
-    status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
+    role: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.enum(['ADMIN', 'ASSET_MANAGER', 'DEPARTMENT_HEAD', 'EMPLOYEE']).optional()),
+    status: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.enum(['ACTIVE', 'INACTIVE']).optional()),
   }),
 });
 

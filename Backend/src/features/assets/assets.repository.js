@@ -27,7 +27,7 @@ const INCLUDE_ASSET_DETAIL = {
     select: {
       id: true,
       status: true,
-      description: true,
+      issueDescription: true,
       createdAt: true,
       updatedAt: true,
     },

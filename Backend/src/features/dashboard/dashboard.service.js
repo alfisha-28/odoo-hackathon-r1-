@@ -69,12 +69,62 @@ const fetchAnalytics = async (organizationId, departmentId, from, to) => {
   // Mock due for maintenance (simplicity heuristic)
   const dueForMaintenanceOrRetirement = [];
 
+  // Compute real assetStatus grouping
+  const totalAssetsCount = raw.assetStatusData.reduce((sum, item) => sum + item._count._all, 0);
+  const statusColors = {
+    AVAILABLE: '#16A34A',
+    ALLOCATED: '#3B82F6',
+    UNDER_MAINTENANCE: '#F59E0B',
+    LOST: '#EF4444',
+    RETIRED: '#8B5CF6',
+    DISPOSED: '#6B7280',
+    RESERVED: '#EC4899',
+  };
+  const statusDisplayNames = {
+    AVAILABLE: 'Available',
+    ALLOCATED: 'Allocated',
+    UNDER_MAINTENANCE: 'Under Maintenance',
+    LOST: 'Lost',
+    RETIRED: 'Retired',
+    DISPOSED: 'Disposed',
+    RESERVED: 'Reserved',
+  };
+
+  const assetStatus = raw.assetStatusData.map(item => {
+    const value = item._count._all;
+    const percentage = totalAssetsCount > 0 ? Math.round((value / totalAssetsCount) * 1000) / 10 : 0;
+    return {
+      name: statusDisplayNames[item.status] || item.status,
+      value,
+      percentage,
+      color: statusColors[item.status] || '#6B7280',
+    };
+  });
+
+  // Compute monthlyAllocation count for last 6 months
+  const monthlyAlloc = {};
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    monthlyAlloc[monthNames[d.getMonth()]] = 0;
+  }
+  raw.allocationDates.forEach(a => {
+    const m = monthNames[a.allocationDate.getMonth()];
+    if (monthlyAlloc[m] !== undefined) {
+      monthlyAlloc[m]++;
+    }
+  });
+  const monthlyAllocation = Object.entries(monthlyAlloc).map(([name, allocations]) => ({ name, allocations }));
+
   return mapDashboardAnalytics({
     utilizationByDepartment,
     maintenanceFrequency,
     mostUsedAssets,
     idleAssets,
     dueForMaintenanceOrRetirement,
+    assetStatus,
+    monthlyAllocation,
   });
 };
 

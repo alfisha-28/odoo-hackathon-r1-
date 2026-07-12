@@ -31,7 +31,7 @@ export default function DepartmentTable({ departments = [], onEdit, onDelete }) 
 
       {/* Head */}
       <td className="py-3.5 px-4 align-middle text-xs font-bold text-[#475569]">
-        {dept.head}
+        {typeof dept.head === 'object' ? dept.head?.name : dept.head || 'N/A'}
       </td>
 
       {/* Assets Count */}

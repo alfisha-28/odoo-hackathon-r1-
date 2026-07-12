@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -53,7 +53,6 @@ export default function ResourceBookingPage() {
     }
   };
 
-  import { useEffect } from 'react';
   useEffect(() => {
     fetchBookings();
   }, []);

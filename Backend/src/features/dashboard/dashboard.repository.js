@@ -58,6 +58,64 @@ const getKPICounts = async (organizationId) => {
     }),
   ]);
 
+  // Week-over-week comparisons
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+  const [
+    prevWeekMaintenance,
+    prevWeekBookings,
+    prevWeekTransfers,
+    prevWeekAvailable,
+    prevWeekAllocated,
+    upcomingReturnsList,
+  ] = await Promise.all([
+    prisma.maintenanceRequest.count({
+      where: {
+        asset: { organizationId },
+        status: { in: ['PENDING', 'APPROVED', 'TECHNICIAN_ASSIGNED', 'IN_PROGRESS'] },
+        OR: [
+          { createdAt: { gte: twoWeeksAgo, lt: oneWeekAgo } },
+          { updatedAt: { gte: twoWeeksAgo, lt: oneWeekAgo } },
+        ]
+      }
+    }),
+    prisma.booking.count({
+      where: {
+        asset: { organizationId },
+        status: { in: ['UPCOMING', 'ONGOING'] },
+        createdAt: { gte: twoWeeksAgo, lt: oneWeekAgo },
+      }
+    }),
+    prisma.transferRequest.count({
+      where: {
+        asset: { organizationId },
+        status: 'REQUESTED',
+        createdAt: { gte: twoWeeksAgo, lt: oneWeekAgo },
+      }
+    }),
+    prisma.asset.count({ where: { organizationId, status: 'AVAILABLE', updatedAt: { lt: oneWeekAgo } } }),
+    prisma.asset.count({ where: { organizationId, status: 'ALLOCATED', updatedAt: { lt: oneWeekAgo } } }),
+    prisma.allocation.findMany({
+      where: {
+        asset: { organizationId },
+        status: 'ACTIVE',
+        expectedReturnDate: { gte: now, lte: nextWeek }
+      },
+      take: 8,
+      orderBy: { expectedReturnDate: 'asc' },
+      include: {
+        asset: { select: { assetTag: true, name: true, category: { select: { name: true } } } },
+        allocatedToEmp: { select: { name: true } },
+      }
+    }),
+  ]);
+
+  const pctChange = (curr, prev) => {
+    if (prev === 0) return curr > 0 ? 100 : 0;
+    return Math.round(((curr - prev) / prev) * 100);
+  };
+
   return {
     assetsAvailable,
     assetsAllocated,
@@ -66,6 +124,34 @@ const getKPICounts = async (organizationId) => {
     pendingTransfers,
     upcomingReturns,
     overdueReturns,
+    changes: {
+      availableDelta: pctChange(assetsAvailable, prevWeekAvailable),
+      allocatedDelta: pctChange(assetsAllocated, prevWeekAllocated),
+      maintenanceDelta: pctChange(maintenanceToday, prevWeekMaintenance),
+      bookingsDelta: pctChange(activeBookings, prevWeekBookings),
+      transfersDelta: pctChange(pendingTransfers, prevWeekTransfers),
+    },
+    upcomingReturnsList: upcomingReturnsList.map(a => {
+      const due = new Date(a.expectedReturnDate);
+      const msLeft = due - now;
+      const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+      const catName = (a.asset.category?.name || '').toLowerCase();
+      let type = 'other';
+      if (catName.includes('laptop') || catName.includes('computer')) type = 'laptop';
+      else if (catName.includes('camera')) type = 'camera';
+      else if (catName.includes('projector') || catName.includes('monitor')) type = 'projector';
+      else if (catName.includes('vehicle') || catName.includes('car')) type = 'vehicle';
+      return {
+        id: a.id,
+        assetId: a.asset.assetTag,
+        assetName: a.asset.name,
+        assignedUser: a.allocatedToEmp?.name || 'Unknown',
+        daysLeft: daysLeft <= 0 ? 'Overdue' : daysLeft === 1 ? 'Due tomorrow' : `Due in ${daysLeft} days`,
+        dueDate: String(due.getDate()),
+        dueMonth: due.toLocaleString('en', { month: 'short' }),
+        type,
+      };
+    }),
   };
 };
 
@@ -95,12 +181,12 @@ const getRecentActivity = async (organizationId) => {
   const activities = [
     ...allocations.map(a => ({
       type: 'ALLOCATION',
-      description: `Asset ${a.asset.name} (${a.asset.assetTag}) allocation updated by ${a.allocatedBy.name}`,
+      description: `Asset ${a.asset.name} (${a.asset.assetTag}) allocation updated by ${a.allocatedBy?.name || 'System'}`,
       timestamp: a.updatedAt,
     })),
     ...bookings.map(b => ({
       type: 'BOOKING',
-      description: `Booking for ${b.asset.name} (${b.asset.assetTag}) updated by ${b.bookedBy.name}`,
+      description: `Booking for ${b.asset.name} (${b.asset.assetTag}) updated by ${b.bookedBy?.name || 'System'}`,
       timestamp: b.updatedAt,
     })),
     ...maintenance.map(m => ({
@@ -122,7 +208,9 @@ const getAnalytics = async (organizationId, departmentId, from, to) => {
     maintenanceData,
     mostUsedBookable,
     mostUsedAllocated,
-    idleAssets
+    idleAssets,
+    assetStatusData,
+    allocationDates,
   ] = await Promise.all([
     prisma.allocation.groupBy({
       by: ['allocatedToDeptId'],
@@ -170,6 +258,18 @@ const getAnalytics = async (organizationId, departmentId, from, to) => {
       select: { id: true, name: true, assetTag: true },
       take: 5,
     }),
+    prisma.asset.groupBy({
+      by: ['status'],
+      where: { organizationId },
+      _count: { _all: true },
+    }),
+    prisma.allocation.findMany({
+      where: {
+        asset: { organizationId },
+        allocationDate: { gte: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000) }
+      },
+      select: { allocationDate: true }
+    }),
   ]);
 
   return {
@@ -178,6 +278,8 @@ const getAnalytics = async (organizationId, departmentId, from, to) => {
     mostUsedBookable,
     mostUsedAllocated,
     idleAssets,
+    assetStatusData,
+    allocationDates,
   };
 };
 

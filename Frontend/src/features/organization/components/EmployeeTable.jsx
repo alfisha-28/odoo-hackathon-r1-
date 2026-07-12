@@ -58,7 +58,7 @@ export default function EmployeeTable({ employees = [], onEdit, onDelete }) {
 
       {/* Department */}
       <td className="py-3.5 px-4 align-middle text-xs font-semibold text-[#475569]">
-        {emp.department}
+        {typeof emp.department === 'object' ? emp.department?.name : emp.department || 'N/A'}
       </td>
 
       {/* Phone */}

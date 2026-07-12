@@ -23,7 +23,6 @@ const updateBookingSchema = z.object({
     status: z.enum(['CANCELLED']).optional(),
   }).refine(
     (data) => {
-      // If both dates provided, check logic
       if (data.startTime && data.endTime) {
         return new Date(data.endTime) > new Date(data.startTime);
       }
@@ -35,10 +34,18 @@ const updateBookingSchema = z.object({
 
 const listBookingsSchema = z.object({
   query: z.object({
-    assetId: z.string().uuid().optional(),
-    start: z.string().datetime({ offset: true }).optional(),
-    end: z.string().datetime({ offset: true }).optional(),
-    status: z.enum(['UPCOMING', 'ONGOING', 'COMPLETED', 'CANCELLED']).optional(),
+    assetId: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.string().uuid().optional()),
+    start: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.string().datetime({ offset: true }).optional()),
+    end: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.string().datetime({ offset: true }).optional()),
+    status: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.enum(['UPCOMING', 'ONGOING', 'COMPLETED', 'CANCELLED']).optional()),
     page: z.string().optional().transform(v => (v ? parseInt(v, 10) : 1)).pipe(z.number().min(1)),
     limit: z.string().optional().transform(v => (v ? parseInt(v, 10) : 20)).pipe(z.number().min(1).max(100)),
   }),

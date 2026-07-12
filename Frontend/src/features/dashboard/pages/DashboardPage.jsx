@@ -10,14 +10,19 @@ import UpcomingReturns from '../components/UpcomingReturns';
 import OverdueAssetsModal from '../components/OverdueAssetsModal';
 
 import dashboardData from '../data/data.json';
+import { useAuthStore } from '../../../store/useAuthStore';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const greetingName = "John"; // Default fallback
+  const user = useAuthStore((state) => state.user);
+  const greetingName = user?.name?.split(' ')[0] || "User";
 
   const [stats, setStats] = useState(dashboardData.stats);
   const [assetStatus, setAssetStatus] = useState(dashboardData.assetStatus);
   const [monthlyAllocation, setMonthlyAllocation] = useState(dashboardData.monthlyAllocation);
+  const [recentActivities, setRecentActivities] = useState(dashboardData.recentActivities);
+  const [upcomingReturnItems, setUpcomingReturns] = useState(dashboardData.upcomingReturns);
+  const [overdueCount, setOverdueCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,16 +33,66 @@ export default function DashboardPage() {
           reportsService.getAnalyticsData(),
         ]);
         
-        // Merge fetched KPI data into stats cards
+        // Merge fetched KPI data into stats cards with real change deltas
         if (kpis) {
+          const c = kpis.changes || {};
           setStats(prev => prev.map(s => {
-            if (s.title === 'Total Assets' && kpis.totalAssets !== undefined) return { ...s, value: kpis.totalAssets.toString() };
-            if (s.title === 'Assets Available' && kpis.assetsAvailable !== undefined) return { ...s, value: kpis.assetsAvailable.toString() };
-            if (s.title === 'Assets Allocated' && kpis.assetsAllocated !== undefined) return { ...s, value: kpis.assetsAllocated.toString() };
-            if (s.title === 'Under Maintenance' && kpis.underMaintenance !== undefined) return { ...s, value: kpis.underMaintenance.toString() };
-            if (s.title === 'Overdue Returns' && kpis.overdueReturns !== undefined) return { ...s, value: kpis.overdueReturns.toString() };
+            if (s.title === 'Available Assets' && kpis.assetsAvailable !== undefined)
+              return { ...s, value: kpis.assetsAvailable.toString(), change: Math.abs(c.availableDelta ?? s.change), isPositive: (c.availableDelta ?? 1) >= 0 };
+            if (s.title === 'Allocated Assets' && kpis.assetsAllocated !== undefined)
+              return { ...s, value: kpis.assetsAllocated.toString(), change: Math.abs(c.allocatedDelta ?? s.change), isPositive: (c.allocatedDelta ?? 1) >= 0 };
+            if (s.title === 'Under Maintenance' && kpis.maintenanceToday !== undefined)
+              return { ...s, value: kpis.maintenanceToday.toString(), change: Math.abs(c.maintenanceDelta ?? s.change), isPositive: (c.maintenanceDelta ?? -1) <= 0 };
+            if (s.title === 'Active Bookings' && kpis.activeBookings !== undefined)
+              return { ...s, value: kpis.activeBookings.toString(), change: Math.abs(c.bookingsDelta ?? s.change), isPositive: (c.bookingsDelta ?? 1) >= 0 };
+            if (s.title === 'Pending Transfers' && kpis.pendingTransfers !== undefined)
+              return { ...s, value: kpis.pendingTransfers.toString(), change: Math.abs(c.transfersDelta ?? s.change), isPositive: (c.transfersDelta ?? -1) <= 0 };
+            if (s.title === 'Upcoming Returns' && kpis.upcomingReturns !== undefined)
+              return { ...s, value: kpis.upcomingReturns.toString() };
             return s;
           }));
+
+          if (kpis.overdueReturns !== undefined) {
+            setOverdueCount(kpis.overdueReturns);
+          }
+
+          if (kpis.upcomingReturnsList?.length > 0) {
+            setUpcomingReturns(kpis.upcomingReturnsList);
+          }
+
+          if (kpis.recentActivity) {
+            const mappedActivities = kpis.recentActivity.map((act, index) => {
+              let status = 'info';
+              let icon = 'Package';
+              if (act.type === 'ALLOCATION') {
+                status = 'success';
+                icon = 'User';
+              } else if (act.type === 'BOOKING') {
+                status = 'purple';
+                icon = 'Calendar';
+              } else if (act.type === 'MAINTENANCE') {
+                status = 'warning';
+                icon = 'Tool';
+              }
+
+              const date = new Date(act.timestamp);
+              const now = new Date();
+              const isToday = date.toDateString() === now.toDateString();
+              const timeString = isToday
+                ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : `Yesterday, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+              return {
+                id: `act-${index}`,
+                title: act.description,
+                subtitle: act.type,
+                time: timeString,
+                status,
+                icon
+              };
+            });
+            setRecentActivities(mappedActivities);
+          }
         }
 
         if (analytics) {
@@ -94,9 +149,11 @@ export default function DashboardPage() {
       </section>
 
       {/* Alert Banner */}
-      <section>
-        <AlertBanner count={3} onAction={handleOverdueAction} />
-      </section>
+      {overdueCount > 0 && (
+        <section>
+          <AlertBanner count={overdueCount} onAction={handleOverdueAction} />
+        </section>
+      )}
 
       {/* Quick Actions */}
       <section className="flex flex-col gap-3">
@@ -131,13 +188,13 @@ export default function DashboardPage() {
 
         {/* Recent Activity Timeline */}
         <div className="lg:col-span-1 min-h-[340px]">
-          <RecentActivity activities={dashboardData.recentActivities} />
+          <RecentActivity activities={recentActivities} />
         </div>
       </section>
 
       {/* Upcoming Returns */}
       <section className="mt-2">
-        <UpcomingReturns returns={dashboardData.upcomingReturns} />
+        <UpcomingReturns returns={upcomingReturnItems} />
       </section>
     </>
   );

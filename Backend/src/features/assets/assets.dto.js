@@ -34,10 +34,20 @@ const updateAssetSchema = z.object({
 const listAssetsQuerySchema = z.object({
   query: z.object({
     search: z.string().optional(),
-    status: z.enum(['AVAILABLE', 'ALLOCATED', 'RESERVED', 'UNDER_MAINTENANCE', 'LOST', 'RETIRED', 'DISPOSED']).optional(),
-    categoryId: z.string().uuid().optional(),
-    departmentId: z.string().uuid().optional(),
-    location: z.string().optional(),
+    // Coerce empty string "" (sent by frontend when no selection) → undefined, then validate enum
+    status: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(
+        z.enum(['AVAILABLE', 'ALLOCATED', 'RESERVED', 'UNDER_MAINTENANCE', 'LOST', 'RETIRED', 'DISPOSED'])
+          .optional()
+      ),
+    categoryId: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.string().uuid().optional()),
+    departmentId: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.string().uuid().optional()),
+    location: z.string().optional().transform(v => v === '' ? undefined : v),
     page: z.string().optional().transform(v => (v ? parseInt(v, 10) : 1)).pipe(z.number().min(1)),
     limit: z.string().optional().transform(v => (v ? parseInt(v, 10) : 20)).pipe(z.number().min(1).max(100)),
   }),

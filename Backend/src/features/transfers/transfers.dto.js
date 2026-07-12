@@ -14,8 +14,12 @@ const createTransferSchema = z.object({
 
 const listTransfersSchema = z.object({
   query: z.object({
-    assetId: z.string().uuid().optional(),
-    status: z.enum(['REQUESTED', 'APPROVED', 'REJECTED', 'COMPLETED']).optional(),
+    assetId: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.string().uuid().optional()),
+    status: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.enum(['REQUESTED', 'APPROVED', 'REJECTED', 'COMPLETED']).optional()),
     page: z.string().optional().transform(v => (v ? parseInt(v, 10) : 1)).pipe(z.number().min(1)),
     limit: z.string().optional().transform(v => (v ? parseInt(v, 10) : 20)).pipe(z.number().min(1).max(100)),
   }),

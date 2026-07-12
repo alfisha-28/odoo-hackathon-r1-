@@ -30,9 +30,15 @@ const updateMaintenanceSchema = z.object({
 
 const listMaintenanceSchema = z.object({
   query: z.object({
-    assetId: z.string().uuid().optional(),
-    status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'TECHNICIAN_ASSIGNED', 'IN_PROGRESS', 'RESOLVED']).optional(),
-    priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).optional(),
+    assetId: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.string().uuid().optional()),
+    status: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.enum(['PENDING', 'APPROVED', 'REJECTED', 'TECHNICIAN_ASSIGNED', 'IN_PROGRESS', 'RESOLVED']).optional()),
+    priority: z.string().optional()
+      .transform(v => v === '' ? undefined : v)
+      .pipe(z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).optional()),
     page: z.string().optional().transform(v => (v ? parseInt(v, 10) : 1)).pipe(z.number().min(1)),
     limit: z.string().optional().transform(v => (v ? parseInt(v, 10) : 20)).pipe(z.number().min(1).max(100)),
   }),

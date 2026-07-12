@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { Globe, ChevronDown } from 'lucide-react';
+import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../../../store/useAuthStore';
 import AuthCard from '../components/AuthCard';
 
 export default function AuthPage() {
-  const { language, setLanguage } = useAuthStore();
+  const { language, setLanguage, isAuthenticated } = useAuthStore();
   const [langOpen, setLangOpen] = useState(false);
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
   const languages = [
     { code: 'EN', name: 'English' },
