@@ -95,19 +95,11 @@ export default function Sidebar({
         </button>
 
         {/* Top: Logo */}
-        <div className={`p-6 flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-          <div className="text-[#7C3AED] flex-shrink-0">
-            {/* Custom SVG AssetFlow Logo */}
-            <svg viewBox="0 0 100 100" fill="none" className="w-8 h-8 stroke-current stroke-[8]">
-              <path d="M50 5L90 28.1V74.4L50 97.5L10 74.4V28.1L50 5Z" strokeLinejoin="round" />
-              <path d="M50 25L71.6 37.5V62.5L50 75L28.4 62.5V37.5L50 25Z" fill="currentColor" fillOpacity="0.2" strokeWidth="4" />
-              <circle cx="50" cy="50" r="10" fill="currentColor" />
-            </svg>
-          </div>
-          {!isCollapsed && (
-            <span className="text-xl font-extrabold text-[#111827] tracking-tight">
-              AssetFlow
-            </span>
+        <div className={`px-7 py--4 flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
+          {isCollapsed ? (
+            <img src="/FSlogo.png" alt="FlowSync" className="w-70 h-30 object-contain" />
+          ) : (
+            <img src="/FSlogo.png" alt="FlowSync" className="w-full max-w-[200px] h-30 object-contain object-left" />
           )}
         </div>
 
@@ -268,8 +260,8 @@ export default function Sidebar({
           {/* Footer branding */}
           {!isCollapsed && (
             <div className="text-[10px] text-[#9CA3AF] font-bold text-center mt-1 select-none">
-              <p>AssetFlow v1.0</p>
-              <p className="font-medium mt-0.5">© 2026 AssetFlow. All rights reserved.</p>
+              <p>FlowSync v1.0</p>
+              <p className="font-medium mt-0.5">© 2026 FlowSync. All rights reserved.</p>
             </div>
           )}
         </div>

@@ -12,7 +12,7 @@ import dashboardData from '../data/data.json';
 export default function DashboardPage() {
   const navigate = useNavigate();
   const greetingName = "John"; // Default fallback
-  
+
   const handleQuickAction = (actionTitle) => {
     if (actionTitle === 'Book Resource') {
       navigate('/bookings');
