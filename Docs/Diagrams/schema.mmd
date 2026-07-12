@@ -1,0 +1,304 @@
+erDiagram
+
+    Organization {
+        uuid id PK
+        string name
+    }
+
+    Department {
+        uuid id PK
+        uuid organizationId FK
+        uuid parentId FK
+        uuid headId FK
+        string name
+        enum status
+    }
+
+    Employee {
+        uuid id PK
+        uuid organizationId FK
+        uuid departmentId FK
+        string name
+        string email
+        string passwordHash
+        enum status
+    }
+
+    EmployeeRole {
+        uuid id PK
+        uuid employeeId FK
+        enum role
+        uuid assignedBy
+    }
+
+    PasswordResetToken {
+        uuid id PK
+        uuid employeeId FK
+        string token
+        datetime expiresAt
+        boolean used
+    }
+
+    AssetCategory {
+        uuid id PK
+        uuid organizationId FK
+        string name
+        string description
+        json customFields
+    }
+
+    Asset {
+        uuid id PK
+        uuid organizationId FK
+        uuid categoryId FK
+        uuid registeredById FK
+
+        string assetTag
+        string name
+        string serialNumber
+        string qrCodeValue
+
+        decimal acquisitionCost
+        datetime acquisitionDate
+
+        enum condition
+        enum status
+
+        string location
+        boolean isBookable
+    }
+
+    AssetDocument {
+        uuid id PK
+        uuid assetId FK
+        string fileUrl
+        string fileType
+    }
+
+    AssetStatusHistory {
+        uuid id PK
+        uuid assetId FK
+        enum fromStatus
+        enum toStatus
+        uuid changedById
+        string reason
+    }
+
+    Allocation {
+        uuid id PK
+        uuid assetId FK
+        uuid allocatedToEmpId FK
+        uuid allocatedToDeptId FK
+        uuid allocatedById FK
+        uuid returnedApprovedById FK
+
+        enum status
+
+        datetime allocationDate
+        datetime expectedReturnDate
+        datetime actualReturnDate
+
+        enum checkInCondition
+        string checkInNotes
+    }
+
+    TransferRequest {
+        uuid id PK
+        uuid assetId FK
+        uuid currentAllocationId FK
+        uuid requestedById FK
+        uuid approvedById FK
+
+        uuid requestedToEmpId
+        uuid requestedToDeptId
+
+        enum status
+        string reason
+    }
+
+    Booking {
+        uuid id PK
+        uuid assetId FK
+        uuid bookedById FK
+        uuid bookedForDeptId FK
+
+        datetime startTime
+        datetime endTime
+
+        enum status
+        string purpose
+    }
+
+    MaintenanceRequest {
+        uuid id PK
+        uuid assetId FK
+        uuid raisedById FK
+        uuid approvedById FK
+        uuid technicianId FK
+
+        enum priority
+        enum status
+
+        string issueDescription
+        string photoUrl
+        string rejectionReason
+        string technicianName
+        string resolutionNotes
+    }
+
+    AuditCycle {
+        uuid id PK
+        uuid organizationId FK
+
+        string name
+
+        uuid scopeDepartmentId
+
+        string scopeLocation
+
+        datetime startDate
+        datetime endDate
+
+        enum status
+    }
+
+    AuditAssignment {
+        uuid id PK
+        uuid auditCycleId FK
+        uuid auditorId FK
+    }
+
+    AuditItem {
+        uuid id PK
+        uuid auditCycleId FK
+        uuid assetId FK
+
+        enum result
+        uuid verifiedById
+
+        boolean discrepancyFlag
+        string notes
+    }
+
+    Notification {
+        uuid id PK
+        uuid employeeId FK
+
+        enum type
+
+        string title
+        string message
+
+        string entityType
+        string entityId
+
+        boolean isRead
+    }
+
+    ActivityLog {
+        uuid id PK
+        uuid organizationId FK
+        uuid employeeId FK
+
+        enum action
+
+        string entityType
+        string entityId
+
+        string description
+        json metadata
+    }
+
+%% =====================================================
+%% ORGANIZATION
+%% =====================================================
+
+    Organization ||--o{ Department : owns
+    Organization ||--o{ Employee : employs
+    Organization ||--o{ AssetCategory : contains
+    Organization ||--o{ Asset : owns
+    Organization ||--o{ AuditCycle : schedules
+    Organization ||--o{ ActivityLog : records
+
+%% =====================================================
+%% DEPARTMENT
+%% =====================================================
+
+    Department ||--o{ Employee : has_members
+    Department ||--o{ Department : parent_child
+    Employee |o--|| Department : heads
+
+    Department ||--o{ Allocation : receives_assets
+    Department ||--o{ Booking : books_assets
+
+%% =====================================================
+%% EMPLOYEE
+%% =====================================================
+
+    Employee ||--o{ EmployeeRole : assigned_roles
+    Employee ||--o{ PasswordResetToken : reset_tokens
+
+    Employee ||--o{ Asset : registers
+
+    Employee ||--o{ Allocation : allocates
+    Employee ||--o{ Allocation : receives
+    Employee ||--o{ Allocation : approves_return
+
+    Employee ||--o{ TransferRequest : requests_transfer
+    Employee ||--o{ TransferRequest : approves_transfer
+
+    Employee ||--o{ Booking : creates
+
+    Employee ||--o{ MaintenanceRequest : raises
+    Employee ||--o{ MaintenanceRequest : approves
+    Employee ||--o{ MaintenanceRequest : assigned_as_technician
+
+    Employee ||--o{ AuditAssignment : assigned_audits
+
+    Employee ||--o{ Notification : receives
+
+    Employee ||--o{ ActivityLog : performs
+
+%% =====================================================
+%% ASSET CATEGORY
+%% =====================================================
+
+    AssetCategory ||--o{ Asset : categorizes
+
+%% =====================================================
+%% ASSET
+%% =====================================================
+
+    Asset ||--o{ AssetDocument : has_documents
+
+    Asset ||--o{ Allocation : allocated
+
+    Asset ||--o{ TransferRequest : transferred
+
+    Asset ||--o{ Booking : booked
+
+    Asset ||--o{ MaintenanceRequest : maintained
+
+    Asset ||--o{ AssetStatusHistory : status_history
+
+    Asset ||--o{ AuditItem : audited
+
+%% =====================================================
+%% ALLOCATION
+%% =====================================================
+
+    Allocation ||--o{ TransferRequest : transfer_origin
+
+%% =====================================================
+%% AUDIT
+%% =====================================================
+
+    AuditCycle ||--o{ AuditAssignment : assigns_auditors
+
+    AuditCycle ||--o{ AuditItem : includes_assets
+
+%% =====================================================
+%% OPTIONAL REFERENCES
+%% =====================================================
+
+    Employee ||--o{ AuditItem : verifies
