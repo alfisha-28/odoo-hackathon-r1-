@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import StatCard from '../components/StatCard';
 import QuickActionCard from '../components/QuickActionCard';
 import AlertBanner from '../components/AlertBanner';
@@ -12,8 +13,12 @@ import dashboardData from '../data/data.json';
 export default function DashboardPage() {
   const greetingName = "John"; // Default fallback
   
+  const navigate = useNavigate();
+
   const handleQuickAction = (actionTitle) => {
-    alert(`Triggered action: "${actionTitle}"`);
+    if (actionTitle === 'Register Asset') {
+      navigate('/assets/register');
+    }
   };
 
   const handleOverdueAction = () => {

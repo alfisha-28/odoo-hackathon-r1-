@@ -10,6 +10,8 @@ import EmployeeTable from '../components/EmployeeTable';
 import Pagination from '../components/Pagination';
 
 import orgData from '../data/data.json';
+import AddCategoryModal from '../components/AddCategoryModal';
+import AddEmployeeModal from '../components/AddEmployeeModal';
 
 export default function OrganizationSetupPage() {
   // Tabs Selection state
@@ -106,14 +108,12 @@ export default function OrganizationSetupPage() {
     }
   };
 
-  // Actions Callbacks
-  const handleAddCategory = () => {
-    alert('Action: Open "Add Asset Category" Dialog Form');
-  };
+  // Modal states
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
 
-  const handleAddEmployee = () => {
-    alert('Action: Open "Register Employee" Dialog Form');
-  };
+  const handleAddCategory = () => setShowCategoryModal(true);
+  const handleAddEmployee = () => setShowEmployeeModal(true);
 
   const handleEdit = (section, id) => {
     alert(`Editing item ID ${id} in ${section}`);
@@ -125,6 +125,18 @@ export default function OrganizationSetupPage() {
 
   return (
     <>
+      {showCategoryModal && (
+        <AddCategoryModal
+          onClose={() => setShowCategoryModal(false)}
+          onAdd={(data) => console.log('New category:', data)}
+        />
+      )}
+      {showEmployeeModal && (
+        <AddEmployeeModal
+          onClose={() => setShowEmployeeModal(false)}
+          onAdd={(data) => console.log('New employee:', data)}
+        />
+      )}
       {/* Title & Breadcrumbs header */}
       <div className="flex flex-col gap-1 select-none">
         <h1 className="text-2xl md:text-3xl font-black tracking-tight text-[#111827]">
