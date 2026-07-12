@@ -25,8 +25,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(requestId);
 app.use(requestLogger);
 
-// 4. Routing Layer
-app.use('/', routes);
+// 4. Routing Layer  (/api/health, /api/auth, /api/departments, ...)
+app.use('/api', routes);
 
 // 5. 404 Handler
 app.use(notFound);

@@ -1,0 +1,121 @@
+### AssetFlow Phase 1 — API Verification Sequence
+### Use with VS Code REST Client extension or copy curl commands below
+
+@baseUrl = http://localhost:3000/api
+@adminEmail = admin@assetflow.io
+@adminPassword = Admin@1234
+
+### ─────────────────────────────────────────────
+### 1. SIGN UP a new employee
+### ─────────────────────────────────────────────
+# @name signup
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "jane.doe@assetflow.io",
+  "password": "JaneDoe@123"
+}
+
+### ─────────────────────────────────────────────
+### 2. LOG IN as the new employee
+### ─────────────────────────────────────────────
+# @name employeeLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane.doe@assetflow.io",
+  "password": "JaneDoe@123"
+}
+
+@employeeToken = {{employeeLogin.response.body.data.token}}
+
+### ─────────────────────────────────────────────
+### 3. LOG IN as the seeded ADMIN
+### ─────────────────────────────────────────────
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+@adminToken = {{adminLogin.response.body.data.token}}
+
+### ─────────────────────────────────────────────
+### 4. ADMIN creates a department
+### ─────────────────────────────────────────────
+# @name createDept
+POST {{baseUrl}}/departments
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Product",
+  "status": "ACTIVE"
+}
+
+### ─────────────────────────────────────────────
+### 5. GET all employees (as admin) to find Jane's id
+### ─────────────────────────────────────────────
+GET {{baseUrl}}/employees?search=jane
+Authorization: Bearer {{adminToken}}
+
+### ─────────────────────────────────────────────
+### 6. ADMIN promotes Jane to ASSET_MANAGER
+###    Replace <JANE_ID> with the id from step 5
+### ─────────────────────────────────────────────
+# @name promote
+PATCH {{baseUrl}}/employees/<JANE_ID>
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "roles": ["ASSET_MANAGER"]
+}
+
+### ─────────────────────────────────────────────
+### 7. CONFIRM — GET employees, Jane should now have ASSET_MANAGER role
+### ─────────────────────────────────────────────
+GET {{baseUrl}}/employees?search=jane
+Authorization: Bearer {{adminToken}}
+
+### ─────────────────────────────────────────────
+### 8. (Optional) Jane logs in again — re-issued token will carry new role
+### ─────────────────────────────────────────────
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane.doe@assetflow.io",
+  "password": "JaneDoe@123"
+}
+
+### ─────────────────────────────────────────────
+### 9. GET categories (authenticated)
+### ─────────────────────────────────────────────
+GET {{baseUrl}}/categories
+Authorization: Bearer {{employeeToken}}
+
+### ─────────────────────────────────────────────
+### 10. ADMIN creates a category
+### ─────────────────────────────────────────────
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Headsets",
+  "description": "Audio headsets and peripherals",
+  "customFields": { "warrantyPeriodMonths": 12 }
+}
+
+### ─────────────────────────────────────────────
+### 11. LOGOUT (stateless — client discards token)
+### ─────────────────────────────────────────────
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{employeeToken}}
