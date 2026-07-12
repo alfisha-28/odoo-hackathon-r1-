@@ -191,9 +191,9 @@
         { "name": "Register Asset", "path": "/assets/register" }
       ]
     },
-    { "name": "Allocation & Transfer", "icon": "ArrowLeftRight", "path": "/allocations", "count": 0, "hasChevron": true },
-    { "name": "Resource Booking", "icon": "Calendar", "path": "/bookings", "count": 0, "hasChevron": true },
-    { "name": "Maintenance", "icon": "Tool", "path": "/maintenance", "count": 0, "hasChevron": true },
+    { "name": "Allocation & Transfer", "icon": "ArrowLeftRight", "path": "/allocations", "count": 0 },
+    { "name": "Resource Booking", "icon": "Calendar", "path": "/bookings", "count": 0 },
+    { "name": "Maintenance", "icon": "Tool", "path": "/maintenance", "count": 0 },
     { "name": "Audit", "icon": "ShieldCheck", "path": "/audit", "count": 0 },
     { "name": "Reports", "icon": "BarChart3", "path": "/reports", "count": 0 },
     { "name": "Notifications", "icon": "Bell", "path": "/notifications", "count": 8 },

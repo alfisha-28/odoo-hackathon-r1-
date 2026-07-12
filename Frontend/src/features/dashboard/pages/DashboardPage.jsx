@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StatCard from '../components/StatCard';
 import QuickActionCard from '../components/QuickActionCard';
@@ -6,6 +7,7 @@ import AssetStatusChart from '../components/AssetStatusChart';
 import MonthlyAllocationChart from '../components/MonthlyAllocationChart';
 import RecentActivity from '../components/RecentActivity';
 import UpcomingReturns from '../components/UpcomingReturns';
+import OverdueAssetsModal from '../components/OverdueAssetsModal';
 
 import dashboardData from '../data/data.json';
 
@@ -14,21 +16,22 @@ export default function DashboardPage() {
   const greetingName = "John"; // Default fallback
 
   const handleQuickAction = (actionTitle) => {
-    if (actionTitle === 'Book Resource') {
-      navigate('/bookings');
-    } else if (actionTitle === 'Register Asset') {
+    if (actionTitle === 'Register Asset') {
       navigate('/assets/register');
-    } else {
-      alert(`Triggered action: "${actionTitle}"`);
+    } else if (actionTitle === 'Book Resource') {
+      navigate('/bookings');
+    } else if (actionTitle === 'Raise Request') {
+      navigate('/maintenance');
     }
   };
 
-  const handleOverdueAction = () => {
-    alert('Redirecting to overdue assets inspection page...');
-  };
+  const [showOverdueModal, setShowOverdueModal] = useState(false);
+
+  const handleOverdueAction = () => setShowOverdueModal(true);
 
   return (
     <>
+      {showOverdueModal && <OverdueAssetsModal onClose={() => setShowOverdueModal(false)} />}
       {/* Greeting Header */}
       <div className="flex flex-col gap-1 select-none">
         <h1 className="text-2xl md:text-3xl font-black tracking-tight text-[#111827]">

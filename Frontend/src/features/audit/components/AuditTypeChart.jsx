@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 
 export default function AuditTypeChart({ data = [] }) {
   return (
@@ -7,38 +7,30 @@ export default function AuditTypeChart({ data = [] }) {
         Audit Types Breakdown
       </h3>
 
-      {/* Bar Chart Area */}
-      <div className="w-full h-44 py-1">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data}
-            margin={{ top: 10, right: 10, left: -25, bottom: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-            <XAxis
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#6B7280', fontSize: 10, fontWeight: '700' }}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#6B7280', fontSize: 10, fontWeight: '700' }}
-              domain={[0, 30]}
-            />
-            <Bar dataKey="value" radius={[4, 4, 0, 0]} barSize={16}>
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill="#7C3AED" />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+      {/* Horizontal Bar list */}
+      <div className="flex flex-col gap-3 w-full">
+        {data.map((item, idx) => {
+          const max = Math.max(...data.map((d) => d.value), 1);
+          const pct = Math.round((item.value / max) * 100);
+          return (
+            <div key={idx} className="flex flex-col gap-1">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-[#475569] truncate pr-2">{item.name}</span>
+                <span className="font-black text-[#111827] flex-shrink-0">{item.value}</span>
+              </div>
+              <div className="h-2 w-full bg-[#F3F4F6] rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-[#7C3AED] transition-all duration-500"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <div className="border-t border-[#F3F4F6] w-full" />
 
-      {/* Footer Link */}
       <button
         onClick={() => alert('Redirect to All Audit Types Breakdown')}
         className="text-[11px] font-black text-[#7C3AED] hover:text-[#6D28D9] transition-colors cursor-pointer self-center"
