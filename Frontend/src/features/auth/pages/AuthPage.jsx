@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Sun, Moon, Globe, ChevronDown } from 'lucide-react';
+import { Globe, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import AuthCard from '../components/AuthCard';
 
 export default function AuthPage() {
-  const { theme, toggleTheme, language, setLanguage } = useAuthStore();
+  const { language, setLanguage } = useAuthStore();
   const [langOpen, setLangOpen] = useState(false);
 
   const languages = [
@@ -29,25 +29,6 @@ export default function AuthPage() {
 
       {/* Global Control Utilities (Top Right) */}
       <div className="flex items-center justify-end gap-6 z-20 self-end">
-        {/* Dark Mode Switcher */}
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-[#7C3AED] dark:hover:text-[#a78bfa] transition-colors cursor-pointer select-none py-1.5 px-2"
-        >
-          {theme === 'dark' ? (
-            <>
-              <Sun className="w-4.5 h-4.5 text-amber-500" />
-              <span>Light mode</span>
-            </>
-          ) : (
-            <>
-              <Moon className="w-4.5 h-4.5 text-gray-650" />
-              <span>Dark mode</span>
-            </>
-          )}
-        </button>
-
         {/* Language Selector */}
         <div className="relative">
           <button
