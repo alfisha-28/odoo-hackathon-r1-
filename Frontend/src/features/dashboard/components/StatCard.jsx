@@ -38,20 +38,20 @@ export default function StatCard({ title, value, change, isPositive, icon, color
 
   return (
     <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer flex flex-col justify-between min-h-[140px]">
-      {/* Top Row: Icon and Title */}
+      {/* Top Row: Icon */}
       <div className="flex justify-between items-start">
         <div className={`p-2.5 rounded-xl border ${styles.border} ${styles.bg} ${styles.text} flex items-center justify-center`}>
           <IconComponent className="w-5 h-5" />
         </div>
-        <span className="text-xs font-semibold text-[#6B7280] tracking-wide text-right">{title}</span>
       </div>
 
-      {/* Middle Row: Large Value */}
-      <div className="mt-3">
+      {/* Middle: Value + Title */}
+      <div className="mt-3 flex flex-col gap-0.5">
         <span className="text-3xl font-extrabold text-[#111827] tracking-tight">{value}</span>
+        <span className="text-xs font-semibold text-[#6B7280] tracking-wide">{title}</span>
       </div>
 
-      {/* Bottom Row: Percentage and Comparison */}
+      {/* Bottom Row: Change */}
       <div className="flex items-center gap-1 mt-2 text-xs font-medium">
         {isPositive ? (
           <span className="text-[#16A34A] flex items-center font-bold">

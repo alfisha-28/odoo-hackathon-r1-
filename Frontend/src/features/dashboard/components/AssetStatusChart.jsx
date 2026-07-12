@@ -6,16 +6,16 @@ export default function AssetStatusChart({ data = [] }) {
   const totalAssets = data.reduce((sum, item) => sum + item.value, 0);
 
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 flex flex-col justify-between h-full">
+    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 flex flex-col h-full">
       {/* Header */}
       <div>
         <h3 className="text-base font-bold text-[#111827]">Asset Status</h3>
       </div>
 
       {/* Chart & Legend Content */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 my-4">
-        {/* Left: Donut Chart with Center Text */}
-        <div className="relative w-[180px] h-[180px] flex items-center justify-center flex-shrink-0">
+      <div className="flex flex-col items-center gap-4 my-4">
+        {/* Donut Chart with Center Text */}
+        <div className="relative w-[160px] h-[160px] flex items-center justify-center flex-shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -45,8 +45,8 @@ export default function AssetStatusChart({ data = [] }) {
           </div>
         </div>
 
-        {/* Right: Custom Legend List */}
-        <div className="flex-grow w-full flex flex-col gap-2">
+        {/* Legend List */}
+        <div className="w-full flex flex-col gap-2">
           {data.map((item) => (
             <div key={item.name} className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
