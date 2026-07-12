@@ -1,0 +1,1 @@
+FlowSync is a modern Enterprise Asset & Resource Management System that helps organizations efficiently manage assets, allocations, bookings, maintenance, and audits through a centralized, user-friendly platform. It streamlines asset tracking, improves resource utilization, and provides real-time operational insights with secure role-based access.
